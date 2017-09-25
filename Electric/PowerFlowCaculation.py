@@ -47,7 +47,7 @@ class PFC(object):
                 if id1 >=0: self.U[id1,0] += e.u
                 if id2 >=0: self.U[id2,0] -= e.u
         return (self.Y,self.I)
-    def __initYUI(self, elmentCout,ty
+    def __initYUI(self, elmentCout):
         N = elmentCout
         self.Y = np.mat(np.zeros((N,N),dtype=type))
         self.U = np.mat(np.zeros((N,1),dtype=type))
@@ -60,15 +60,36 @@ class PFC(object):
         num = 0;isFirst = True
         
         eus = [e for e in self.electricElements if e.eType == EType.Eu]#理想电压源列表
+        
         def prepEu():#预处理有理想电源的节点电压方程组参数
-            def findeus():#查找是否有并联理想电压源
-                for i in eus:
-                    bleus =[i]
-                    for j in eus:
+            def findeus(eus):#查找是否有并联理想电压源
+                eus1 = copy.copy(eus)
+                for i in eus1:
+                    eus1.pop(eus1.index(i))
+                    l = [i[0],i[1]]
+                    while(True):
+                        has = False
+                        for j in eus1:
+                            if l.count(j[0])> 0 and l.count(j[1]) > 0:return True
+                            if l.count(j[0])> 0 or l.count(j[1]) > 0:
+                                l +=[j[0],j[1]]
+                                eus1.pop(eus1.index(j))
+                                has = True
+                                break
+                        if not has :break
+                return False
+            if findeus(eus): raise Exception("有并联的理想电压源")
 
             eus.sort(key=lambda x:(max(x),min(x) == -1,min(x)))
+            unodes =list()#保存已知节点电压的节点及其电压
             for e in eus:
-                if e.ids.min() >-1:
+                if e.ids.min() == -1:
+                    node = e.ids.max()
+                    unodes.append((node,e.u))
+                    def funodes(node)
+                    for n in eus:
+                        if n.ids.count(node)>0:
+                            unodes.append((1,n.u) if n.ids[0] == node else (0,-e.u))
 
         while self.__iteration(isFirst) and num <= self.numOfIterations:
             if len(eus) <= 0:self.U = np.linalg.solve(self.Y,self.I)#无理想电压源
@@ -77,9 +98,8 @@ class PFC(object):
                     for e in eus:
                         if e.ids[0] == -1 or e.ids[1] == -1:
                             pass
-                        elif True:sorted()
+                        elif True:
                             pass
-
             num += 1
             isFirst = False
         return (self.U,self.Y,self.I)

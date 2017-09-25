@@ -70,25 +70,25 @@ class PFCUnitTest(unittest.TestCase):
             print(e) 
 
     def test_S_Caculate(self):
-    try:
-        pfc = PFC()
-        elements = [ee.createDcEi(1,(0,-1),5),ee.createDcY(2,(0,1),1),
-            ee.createDcY(3,(-1,1),1/2.0),ee.createDcY(4,(1,2),1/2.0),
-            ee.createDcY(5,(2,-1),1/1.0),ee.createDcEi(6,(-1,2),1)]
-        pfc.addElement(elements)
-        pfc.createYIMatrix()
-        pfc.caculate()
-        #print(np.mat(pfc.Y)*np.mat(pfc.U))
-        self.assertTrue(np.all(np.abs(pfc.Y*pfc.U - pfc.I <\
-        np.mat(np.ones(pfc.I.shape))*1e-10)))
-        self.assertTrue(np.all(pfc.U==np.array([-10.6,-5.6,-1.2]).reshape(3,1)))
-        self.assertTrue(np.all(pfc.I==np.array([-5,0,1.0]).reshape(3,1)))
-        self.assertTrue(np.all(pfc.Y==np.array([1.0,-1.0,0,-1.0,2.0,-0.5,0.0,-0.5,1.5]).reshape(3,3)))
-        '''print(pfc.U)
-        print(pfc.Y)
-        print(pfc.I)'''
-    except Exception as e:
-        print(e)
+        try:
+            pfc = PFC()
+            elements = [ee.createDcEi(1,(0,-1),5),ee.createDcY(2,(0,1),1),
+                ee.createDcY(3,(-1,1),1/2.0),ee.createDcY(4,(1,2),1/2.0),
+                ee.createDcY(5,(2,-1),1/1.0),ee.createDcEi(6,(-1,2),1)]
+            pfc.addElement(elements)
+            pfc.createYIMatrix()
+            pfc.caculate()
+            #print(np.mat(pfc.Y)*np.mat(pfc.U))
+            self.assertTrue(np.all(np.abs(pfc.Y*pfc.U - pfc.I <\
+            np.mat(np.ones(pfc.I.shape))*1e-10)))
+            self.assertTrue(np.all(pfc.U==np.array([-10.6,-5.6,-1.2]).reshape(3,1)))
+            self.assertTrue(np.all(pfc.I==np.array([-5,0,1.0]).reshape(3,1)))
+            self.assertTrue(np.all(pfc.Y==np.array([1.0,-1.0,0,-1.0,2.0,-0.5,0.0,-0.5,1.5]).reshape(3,3)))
+            '''print(pfc.U)
+            print(pfc.Y)
+            print(pfc.I)'''
+        except Exception as e:
+            print(e)
 
 class ElectricElementUnitTest(unittest.TestCase):
     def testcreate(self):
