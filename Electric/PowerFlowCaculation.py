@@ -82,15 +82,24 @@ class PFC(object):
 
             eus.sort(key=lambda x:(max(x),min(x) == -1,min(x)))
             unodes =list()#保存已知节点电压的节点及其电压
-            for e in eus:
-                if e.ids.min() == -1:
+            
+            def funodes(node)#查找与给定理想电压源相连的理想电压源列表
+                        for n in eus:
+                            if n.ids.count(node)>0:
+                                nd = (1,n.u) if n.ids[0] == node else (0,-e.u)
+                                unodes.append(nd)
+                                funodes(nd)
+            for e in eus:#查找并保存与以参考节点为节点理想电压源及其相连的理想电压源的的节点列表
+                if e.ids.min() == -1:#查找以参考节点为节点的理想电压源的理想电压源列表
                     node = e.ids.max()
                     unodes.append((node,e.u))
-                    def funodes(node)
-                    for n in eus:
-                        if n.ids.count(node)>0:
-                            unodes.append((1,n.u) if n.ids[0] == node else (0,-e.u))
+                    funodes(node)
+            
 
+
+        prepEu()#预处理
+
+        '''解节点电压方程组'''
         while self.__iteration(isFirst) and num <= self.numOfIterations:
             if len(eus) <= 0:self.U = np.linalg.solve(self.Y,self.I)#无理想电压源
             else:
