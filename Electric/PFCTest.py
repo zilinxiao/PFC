@@ -70,7 +70,7 @@ class PFCUnitTest(unittest.TestCase):
             print(e) 
 
     def test_S_Caculate(self):
-        try:
+        try:#测试含有功率源的解节点电压方程组
             pfc = PFC()
             elements = [ee.createDcEi(1,(0,-1),5),ee.createDcY(2,(0,1),1),
                 ee.createDcY(3,(-1,1),1/2.0),ee.createDcY(4,(1,2),1/2.0),
@@ -87,6 +87,23 @@ class PFCUnitTest(unittest.TestCase):
             '''print(pfc.U)
             print(pfc.Y)
             print(pfc.I)'''
+        except Exception as e:
+            print(e)
+    def test_preu_caculate(self):
+        #测试解节点电压方程组的预处理程序，主要是测试是否有并联支路电压源，并处理电压源
+        try:#测试含有功率源的解节点电压方程组
+            pfc = PFC()
+            elements = [ee.createDcY(0,(0,-1),1),ee.createDcEu(1,(0,1),2),
+                ee.createDcEu(2,(-1,1),2),ee.createDcEu(3,(1,2),2),
+                ee.createDcEu(4,(2,-1),2),ee.createDcY(5,(2,3),1),
+                ee.createDcY(6,(3,-1),1),ee.createDcEu(7,(3,4),2),
+                ee.createDcY(8,(4,-1),1),ee.createDcEu(9,(4,5),2),
+                ee.createDcY(10,(5,-1),1),ee.createDcY(11,(5,6),1),
+                ee.createDcY(12,(6,-1),1),ee.createDcEu(13,(6,7),1),
+                ee.createDcEu(14,(-1,7),2)]
+            pfc.addElement(elements)
+            pfc.createYIMatrix()
+            pfc.caculate()
         except Exception as e:
             print(e)
 

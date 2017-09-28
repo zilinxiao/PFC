@@ -1,6 +1,7 @@
 import numpy as np
 from enum import Enum,unique
-import math as mh 
+import math as mh
+import copy
 class PFC(object):
     '''潮流计算类PFC'''
     # electricElementsCount = 0
@@ -47,7 +48,7 @@ class PFC(object):
                 if id1 >=0: self.U[id1,0] += e.u
                 if id2 >=0: self.U[id2,0] -= e.u
         return (self.Y,self.I)
-    def __initYUI(self, elmentCout):
+    def __initYUI(self, elmentCout,type):
         N = elmentCout
         self.Y = np.mat(np.zeros((N,N),dtype=type))
         self.U = np.mat(np.zeros((N,1),dtype=type))
@@ -65,14 +66,14 @@ class PFC(object):
             def findeus(eus):#查找是否有并联理想电压源
                 eus1 = copy.copy(eus)
                 for i in eus1:
-                    eus1.pop(eus1.index(i))
-                    l = [i[0],i[1]]
+                    eus1.pop(i)
+                    l = [i.ids[0],i.ids[1]]
                     while(True):
                         has = False
                         for j in eus1:
-                            if l.count(j[0])> 0 and l.count(j[1]) > 0:return True
-                            if l.count(j[0])> 0 or l.count(j[1]) > 0:
-                                l +=[j[0],j[1]]
+                            if l.count(j.ids[0])> 0 and l.count(j.ids[1]) > 0:return True
+                            if l.count(j.ids[0])> 0 or l.count(j.ids[1]) > 0:
+                                l +=[j.ids[0],j.ids[1]]
                                 eus1.pop(eus1.index(j))
                                 has = True
                                 break
@@ -83,12 +84,12 @@ class PFC(object):
             eus.sort(key=lambda x:(max(x),min(x) == -1,min(x)))
             unodes =list()#保存已知节点电压的节点及其电压
             
-            def funodes(node)#查找与给定理想电压源相连的理想电压源列表
-                        for n in eus:
-                            if n.ids.count(node)>0:
-                                nd = (1,n.u) if n.ids[0] == node else (0,-e.u)
-                                unodes.append(nd)
-                                funodes(nd)
+            def funodes(node):#查找与给定理想电压源相连的理想电压源列表
+                for n in eus:
+                    if n.ids.count(node)>0:
+                        nd = (1,n.u) if n.ids[0] == node else (0,-e.u)
+                        unodes.append(nd)
+                        funodes(nd)
             for e in eus:#查找并保存与以参考节点为节点理想电压源及其相连的理想电压源的的节点列表
                 if e.ids.min() == -1:#查找以参考节点为节点的理想电压源的理想电压源列表
                     node = e.ids.max()
