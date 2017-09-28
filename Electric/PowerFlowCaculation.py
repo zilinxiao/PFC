@@ -82,21 +82,34 @@ class PFC(object):
             if findeus(eus): raise Exception("有并联的理想电压源")
 
             eus.sort(key=lambda x:(max(x),min(x) == -1,min(x)))
-            unodes =list()#保存已知节点电压的节点及其电压
+            unodes = dict()#保存节点理想电压源及节点电压
             
+<<<<<<< HEAD
             def funodes(node):#查找与给定理想电压源相连的理想电压源列表
                 for n in eus:
                     if n.ids.count(node)>0:
                         nd = (1,n.u) if n.ids[0] == node else (0,-e.u)
                         unodes.append(nd)
                         funodes(nd)
+=======
+            def funodes(node)#查找与给定理想电压源相连的理想电压源列表
+                        for n in eus:
+                            if n.ids.count(node)>0 and\
+                            not unodes.has_key(n.ids[0] if n.ids[0] == node else n.ids[1]):
+                                nd = {n.ids[1],n.u} if n.ids[0] == node else {n.ids[0],-e.u}
+                                unodes.append(nd)
+                                funodes(nd)
+>>>>>>> 9af1670f41c3d8ca61986dea9aa9773af6381856
             for e in eus:#查找并保存与以参考节点为节点理想电压源及其相连的理想电压源的的节点列表
                 if e.ids.min() == -1:#查找以参考节点为节点的理想电压源的理想电压源列表
                     node = e.ids.max()
-                    unodes.append((node,e.u))
+                    unodes.append({node,e.u})
                     funodes(node)
-            
-
+            unodes1 = list()#保存不以参考节点为节点的理想电压及其相邻节点
+            for e in eus:#查找并保存剩余理想电压源节点及节点电压
+                if not unodes.has_key(e.ids[0]) and not unodes.has_key(e.ids[1]):
+                    unodes.append(e.ids[1],e.u)
+                    funodes(e.ids[1])
 
         prepEu()#预处理
 
