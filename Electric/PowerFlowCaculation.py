@@ -66,13 +66,13 @@ class PFC(object):
             def findeus(eus):#查找是否有并联理想电压源
                 eus1 = copy.copy(eus)
                 for i in eus1:
-                    eus1.pop(i)
+                    eus1.pop(eus1.index(i))
                     l = [i.ids[0],i.ids[1]]
                     while(True):
                         has = False
                         for j in eus1:
-                            if l.count(j.ids[0])> 0 and l.count(j.ids[1]) > 0:return True
-                            if l.count(j.ids[0])> 0 or l.count(j.ids[1]) > 0:
+                            if j.ids[0] in l and j.ids[1] in l: return True
+                            if j.ids[0] in l or j.ids[1] in l:
                                 l +=[j.ids[0],j.ids[1]]
                                 eus1.pop(eus1.index(j))
                                 has = True
@@ -81,34 +81,25 @@ class PFC(object):
                 return False
             if findeus(eus): raise Exception("有并联的理想电压源")
 
-            eus.sort(key=lambda x:(max(x),min(x) == -1,min(x)))
+            eus.sort(key=lambda x:(max(x.ids),min(x.ids) == -1,min(x.ids)))
             unodes = dict()#保存节点理想电压源及节点电压
             
-<<<<<<< HEAD
             def funodes(node):#查找与给定理想电压源相连的理想电压源列表
                 for n in eus:
-                    if n.ids.count(node)>0:
-                        nd = (1,n.u) if n.ids[0] == node else (0,-e.u)
-                        unodes.append(nd)
+                    if node in n.ids and\
+                    not ((n.ids[0] if n.ids[0] == node else n.ids[1])in unodes.keys()):
+                        nd = {n.ids[1],n.u} if n.ids[0] == node else {n.ids[0],-e.u}
+                        unodes.items.append(nd)
                         funodes(nd)
-=======
-            def funodes(node)#查找与给定理想电压源相连的理想电压源列表
-                        for n in eus:
-                            if n.ids.count(node)>0 and\
-                            not unodes.has_key(n.ids[0] if n.ids[0] == node else n.ids[1]):
-                                nd = {n.ids[1],n.u} if n.ids[0] == node else {n.ids[0],-e.u}
-                                unodes.append(nd)
-                                funodes(nd)
->>>>>>> 9af1670f41c3d8ca61986dea9aa9773af6381856
             for e in eus:#查找并保存与以参考节点为节点理想电压源及其相连的理想电压源的的节点列表
-                if e.ids.min() == -1:#查找以参考节点为节点的理想电压源的理想电压源列表
-                    node = e.ids.max()
-                    unodes.append({node,e.u})
+                if min(e.ids) == -1:#查找以参考节点为节点的理想电压源的理想电压源列表
+                    node = max(e.ids)
+                    unodes[node] = e.u
                     funodes(node)
             unodes1 = list()#保存不以参考节点为节点的理想电压及其相邻节点
             for e in eus:#查找并保存剩余理想电压源节点及节点电压
-                if not unodes.has_key(e.ids[0]) and not unodes.has_key(e.ids[1]):
-                    unodes.append(e.ids[1],e.u)
+                if not e.ids[0] in unodes.keys() and not e.ids[1] in unodes.keys():
+                    unodes[e.ids[1]] =e.u
                     funodes(e.ids[1])
 
         prepEu()#预处理

@@ -90,8 +90,8 @@ class PFCUnitTest(unittest.TestCase):
         except Exception as e:
             print(e)
     def test_preu_caculate(self):
-        #测试解节点电压方程组的预处理程序，主要是测试是否有并联支路电压源，并处理电压源
-        try:#测试含有功率源的解节点电压方程组
+        #测试解节点电压方程组的预处理程序，主要是测试是否有并联支路电压源
+        try:
             pfc = PFC()
             elements = [ee.createDcY(0,(0,-1),1),ee.createDcEu(1,(0,1),2),
                 ee.createDcEu(2,(-1,1),2),ee.createDcEu(3,(1,2),2),
@@ -104,9 +104,25 @@ class PFCUnitTest(unittest.TestCase):
             pfc.addElement(elements)
             pfc.createYIMatrix()
             pfc.caculate()
+            self.assertTrue(False)
         except Exception as e:
-            print(e)
-
+           self.assertEqual(e.args[0],'有并联的理想电压源')
+        try:
+            pfc = PFC()
+            elements = [ee.createDcY(0,(0,-1),1),ee.createDcEu(1,(0,1),2),
+                ee.createDcEu(2,(-1,1),2),ee.createDcEu(3,(1,2),2),
+                ee.createDcEu(4,(2,-1),2),ee.createDcY(5,(2,3),1),
+                ee.createDcY(6,(3,-1),1),ee.createDcEu(7,(3,4),2),
+                ee.createDcY(8,(4,-1),1),ee.createDcEu(9,(4,5),2),
+                ee.createDcY(10,(5,-1),1),ee.createDcY(11,(5,6),1),
+                ee.createDcY(12,(6,-1),1),ee.createDcEu(13,(6,7),1),
+                ee.createDcEu(14,(-1,7),2)]
+            pfc.addElement(elements)
+            pfc.createYIMatrix()
+            pfc.caculate()
+            self.assertTrue(False)
+        except Exception as e:
+           self.assertEqual(e.args[0],'有并联的理想电压源')
 class ElectricElementUnitTest(unittest.TestCase):
     def testcreate(self):
         e1 = ee(EType.Y,1,(0,1),10,0,0,0)
