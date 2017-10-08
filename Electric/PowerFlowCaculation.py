@@ -76,6 +76,8 @@ class PFC(object):
             isFirst = False
         return (self.U,self.Y,self.I)
     def __prepEu(self,eus):#预处理有理想电源的节点电压方程组参数
+        if __findParallelEu(eus) raise PFCErr(PFCErrCode.HasParallelEu,'电路中含有并联理想电压源或者环接理想电压源')
+        '''
         def findeus(eus):#查找是否有并联理想电压源
             eus1 = copy.copy(eus)
             for i in eus1:
@@ -118,7 +120,22 @@ class PFC(object):
                     nd = {n.ids[1],n.u} if n.ids[0] == node else {n.ids[0],-e.u}
                     unodes.items.append(nd)
                     funodes(nd)
-            
+        '''    
+    def __findParallelEu(eus):
+        '''查找电路中是否有并联理想电压源或者环接理想电压源'''
+        eus = eus[:]
+        isfind = list()#已经查找过得元件
+        for i in eus:
+            if i not in isfind:
+                isfind.append(i)
+                l = [i.ids[0],i.ids[1]]
+                for j in eus:
+                    if j not in isfind:
+                        if j.ids[0] in l and j.ids[1] in l:return True
+                        if j.ids[0] in l or j.ids[1] in l:
+                            l +=[j.ids[0],j.ids[1]]
+                            isfind.append(j)
+
 
     def __iteration(self,isFirst):
         isIter = False#是否需要继续迭代，FALSE表示迭代结束，TRUE表示继续迭代
@@ -141,7 +158,7 @@ class PFC(object):
         elif ids[1]:element.u = self.U[ids[0],0]
         else:element.u = self.U[ids[0],0] - self.U[ids[1],0]
         return element.u
-
+        
 class ElectricElement(object):
     '''电气元件类，主要有eType，id,ids,u,i,r等属性,eType:电气元件类型(Y,Eu,Ei),
     id(int):元件编号,ids(int,int):元件两端节点号,参考节点编号为-1,y(float):电阻(S),u(float):电压(V),i(float):电流(A)
@@ -186,8 +203,8 @@ class ElectricElement(object):
         return ElectricElement(EType.Ei,id,ids,complex(0.0,0.0),complex(0.0,0.0),i,complex(0.0,0.0))
     
     def __str__(self):
-        return "ElectricElement(电气元件类)\"eType:{0}, id:{1}, ids:({2},{3}), r:{4}A, u:{5}V, i:{6}Ω,\
-                  s:{7}w\"".format(self.eType,self.id,self.ids[0],self.ids[1],self.y,self.u,self.i,self.s)
+        return 'ElectricElement(电气元件类)\"eType:{0}, id:{1}, ids:({2},{3}), r:{4}A, u:{5}V, i:{6}Ω,s:{7}w"'\
+    .format(self.eType,self.id,self.ids[0],self.ids[1],self.y,self.u,self.i,self.s)
     
 @unique
 class EType(Enum):
@@ -195,3 +212,23 @@ class EType(Enum):
     Eu = 1
     Ei = 2
     S = 3
+
+class TreeNode(object):
+    '''树节点类，每个节点可以有≥0个子节点'''
+    def __init__(self,data,child = None):
+        '''data:节点数据'''
+        self.data = data
+        self.childs = child
+    def addChild(self,*data):
+        self.childs = list()
+        for d in data:
+            self.childs.append(Node(d))
+
+class PFCErr(Exception):
+    def __init__(self,errCode,msg):
+        self.args = (errCode,msg)
+        self.errCode = errCode
+        self.msg = msg
+@unique
+class PFCErrCode(Enum):
+    HasParallelEu = 0

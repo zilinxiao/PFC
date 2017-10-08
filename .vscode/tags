@@ -4,50 +4,72 @@
 !_TAG_PROGRAM_NAME	Exuberant Ctags	//
 !_TAG_PROGRAM_URL	http://ctags.sourceforge.net	/official site/
 !_TAG_PROGRAM_VERSION	5.8	//
-EType	../Electric\PFCTest.py	/^from PowerFlowCaculation import PFC, ElectricElement as ee, EType$/;"	kind:namespace	line:2
-EType	../Electric\PowerFlowCaculation.py	/^class EType(Enum):$/;"	kind:class	line:189
-Ei	../Electric\PowerFlowCaculation.py	/^    Ei = 2$/;"	kind:variable	line:192
-ElectricElement	../Electric\PowerFlowCaculation.py	/^class ElectricElement(object):$/;"	kind:class	line:141
-ElectricElementUnitTest	../Electric\PFCTest.py	/^class ElectricElementUnitTest(unittest.TestCase):$/;"	kind:class	line:93
+EType	../Electric\PFCTest.py	/^from PowerFlowCaculation import PFC, ElectricElement as ee, EType,TreeNode as tn$/;"	kind:namespace	line:2
+EType	../Electric\PowerFlowCaculation.py	/^class EType(Enum):$/;"	kind:class	line:210
+Ei	../Electric\PowerFlowCaculation.py	/^    Ei = 2$/;"	kind:variable	line:213
+ElectricElement	../Electric\PowerFlowCaculation.py	/^class ElectricElement(object):$/;"	kind:class	line:162
+ElectricElementUnitTest	../Electric\PFCTest.py	/^class ElectricElementUnitTest(unittest.TestCase):$/;"	kind:class	line:203
 Enum	../Electric\PowerFlowCaculation.py	/^from enum import Enum,unique$/;"	kind:namespace	line:2
-Eu	../Electric\PowerFlowCaculation.py	/^    Eu = 1$/;"	kind:variable	line:191
-PFC	../Electric\PFCTest.py	/^from PowerFlowCaculation import PFC, ElectricElement as ee, EType$/;"	kind:namespace	line:2
-PFC	../Electric\PowerFlowCaculation.py	/^class PFC(object):$/;"	kind:class	line:4
+Eu	../Electric\PowerFlowCaculation.py	/^    Eu = 1$/;"	kind:variable	line:212
+HasParallelEu	../Electric\PowerFlowCaculation.py	/^    HasParallelEu = 0/;"	kind:variable	line:234
+PFC	../Electric\PFCTest.py	/^from PowerFlowCaculation import PFC, ElectricElement as ee, EType,TreeNode as tn$/;"	kind:namespace	line:2
+PFC	../Electric\PowerFlowCaculation.py	/^class PFC(object):$/;"	kind:class	line:5
+PFCErr	../Electric\PowerFlowCaculation.py	/^class PFCErr(Exception):$/;"	kind:class	line:227
+PFCErrCode	../Electric\PowerFlowCaculation.py	/^class PFCErrCode(Enum):$/;"	kind:class	line:233
 PFCTest.py	../Electric\PFCTest.py	1;"	kind:file	line:1
 PFCUnitTest	../Electric\PFCTest.py	/^class PFCUnitTest(unittest.TestCase):$/;"	kind:class	line:4
 PowerFlowCaculation.py	../Electric\PowerFlowCaculation.py	1;"	kind:file	line:1
-S	../Electric\PowerFlowCaculation.py	/^    S = 3$/;"	kind:variable	line:193
-Y	../Electric\PowerFlowCaculation.py	/^    Y = 0$/;"	kind:variable	line:190
-__initYUI	../Electric\PowerFlowCaculation.py	/^    def __initYUI(self, elmentCout):$/;"	kind:member	line:50
-__init__	../Electric\PowerFlowCaculation.py	/^    def __init__(self, eType,id,ids,y,u,i,s):$/;"	kind:member	line:146
-__init__	../Electric\PowerFlowCaculation.py	/^    def __init__(self, numOfIterations=100, voltageOfIterator=1):$/;"	kind:member	line:7
-__iteration	../Electric\PowerFlowCaculation.py	/^    def __iteration(self,isFirst):$/;"	kind:member	line:119
-__str__	../Electric\PowerFlowCaculation.py	/^    def __str__(self):$/;"	kind:member	line:184
-add	../Electric\test.py	/^def add()$/;"	kind:function	line:1
-addElement	../Electric\PowerFlowCaculation.py	/^    def addElement(self, elements):$/;"	kind:member	line:12
-caculate	../Electric\PowerFlowCaculation.py	/^    def caculate(self):$/;"	kind:member	line:55
-createAcEi	../Electric\PowerFlowCaculation.py	/^    def createAcEi(id,ids,i):$/;"	kind:member	line:181
-createAcEu	../Electric\PowerFlowCaculation.py	/^    def createAcEu(id,ids,u):$/;"	kind:member	line:178
-createAcY	../Electric\PowerFlowCaculation.py	/^    def createAcY(id,ids,y):$/;"	kind:member	line:175
-createDcEi	../Electric\PowerFlowCaculation.py	/^    def createDcEi(id,ids,i):$/;"	kind:member	line:171
-createDcEu	../Electric\PowerFlowCaculation.py	/^    def createDcEu(id,ids,u):$/;"	kind:member	line:168
-createDcY	../Electric\PowerFlowCaculation.py	/^    def createDcY(id,ids,y):$/;"	kind:member	line:165
-createYIMatrix	../Electric\PowerFlowCaculation.py	/^    def createYIMatrix(self):$/;"	kind:member	line:22
-ee	../Electric\PFCTest.py	/^from PowerFlowCaculation import PFC, ElectricElement as ee, EType$/;"	kind:namespace	line:2
-findeus	../Electric\PowerFlowCaculation.py	/^            def findeus(eus):#查找是否有并联理想电压源$/;"	kind:function	line:65
-funodes	../Electric\PowerFlowCaculation.py	/^            def funodes(node)#查找与给定理想电压源相连的理想电压源列表$/;"	kind:function	line:86
-getElementU	../Electric\PowerFlowCaculation.py	/^    def getElementU(self,element):$/;"	kind:member	line:134
-mh	../Electric\PowerFlowCaculation.py	/^import math as mh $/;"	kind:namespace	line:3
+S	../Electric\PowerFlowCaculation.py	/^    S = 3$/;"	kind:variable	line:214
+TreeNode	../Electric\PowerFlowCaculation.py	/^class TreeNode(object):$/;"	kind:class	line:216
+Y	../Electric\PowerFlowCaculation.py	/^    Y = 0$/;"	kind:variable	line:211
+__findParallelEu	../Electric\PowerFlowCaculation.py	/^    def __findParallelEu(eus):$/;"	kind:member	line:124
+__initYUI	../Electric\PowerFlowCaculation.py	/^    def __initYUI(self, elmentCout,type):$/;"	kind:member	line:51
+__init__	../Electric\PowerFlowCaculation.py	/^    def __init__(self, eType,id,ids,y,u,i,s):$/;"	kind:member	line:167
+__init__	../Electric\PowerFlowCaculation.py	/^    def __init__(self, numOfIterations=100, voltageOfIterator=1):$/;"	kind:member	line:8
+__init__	../Electric\PowerFlowCaculation.py	/^    def __init__(self,data,child = None):$/;"	kind:member	line:218
+__init__	../Electric\PowerFlowCaculation.py	/^    def __init__(self,errCode,msg):$/;"	kind:member	line:228
+__iteration	../Electric\PowerFlowCaculation.py	/^    def __iteration(self,isFirst):$/;"	kind:member	line:140
+__prepEu	../Electric\PowerFlowCaculation.py	/^    def __prepEu(self,eus):#预处理有理想电源的节点电压方程组参数$/;"	kind:member	line:78
+__str__	../Electric\PowerFlowCaculation.py	/^    def __str__(self):$/;"	kind:member	line:205
+addChild	../Electric\PowerFlowCaculation.py	/^    def addChild(self,*data):$/;"	kind:member	line:222
+addElement	../Electric\PowerFlowCaculation.py	/^    def addElement(self, elements):$/;"	kind:member	line:13
+caculate	../Electric\PowerFlowCaculation.py	/^    def caculate(self):$/;"	kind:member	line:56
+copy	../Electric\PowerFlowCaculation.py	/^import copy$/;"	kind:namespace	line:4
+copy	../Electric\test.py	/^import copy$/;"	kind:namespace	line:1
+createAcEi	../Electric\PowerFlowCaculation.py	/^    def createAcEi(id,ids,i):$/;"	kind:member	line:202
+createAcEu	../Electric\PowerFlowCaculation.py	/^    def createAcEu(id,ids,u):$/;"	kind:member	line:199
+createAcY	../Electric\PowerFlowCaculation.py	/^    def createAcY(id,ids,y):$/;"	kind:member	line:196
+createDcEi	../Electric\PowerFlowCaculation.py	/^    def createDcEi(id,ids,i):$/;"	kind:member	line:192
+createDcEu	../Electric\PowerFlowCaculation.py	/^    def createDcEu(id,ids,u):$/;"	kind:member	line:189
+createDcY	../Electric\PowerFlowCaculation.py	/^    def createDcY(id,ids,y):$/;"	kind:member	line:186
+createYIMatrix	../Electric\PowerFlowCaculation.py	/^    def createYIMatrix(self):$/;"	kind:member	line:23
+ee	../Electric\PFCTest.py	/^from PowerFlowCaculation import PFC, ElectricElement as ee, EType,TreeNode as tn$/;"	kind:namespace	line:2
+eus	../Electric\test.py	/^eus = [(7,8),(2,4),(5,3),(1,4),(-1,2),(6,5)]$/;"	kind:variable	line:40
+eus	../Electric\test.py	/^eus = [(7,8),(2,4),(5,3),(1,4),(1,2),(6,5)]$/;"	kind:variable	line:2
+f	../Electric\PFCTest.py	/^        def f(e):$/;"	kind:function	line:151
+f	../Electric\PFCTest.py	/^        def f(e):$/;"	kind:function	line:173
+f1	../Electric\test.py	/^def f1(eus):$/;"	kind:function	line:3
+f2	../Electric\test.py	/^def f2(eus):$/;"	kind:function	line:20
+findEusTree	../Electric\test.py	/^def findEusTree(eus):$/;"	kind:function	line:41
+findParallelEu	../Electric\PFCTest.py	/^        def findParallelEu(eus):$/;"	kind:function	line:195
+findeus	../Electric\PFCTest.py	/^            def findeus(eus):$/;"	kind:function	line:199
+getElementU	../Electric\PowerFlowCaculation.py	/^    def getElementU(self,element):$/;"	kind:member	line:155
+mh	../Electric\PowerFlowCaculation.py	/^import math as mh$/;"	kind:namespace	line:3
+next	../Electric\PFCTest.py	/^                def next():$/;"	kind:function	line:201
 np	../Electric\PFCTest.py	/^import numpy as np$/;"	kind:namespace	line:3
 np	../Electric\PowerFlowCaculation.py	/^import numpy as np$/;"	kind:namespace	line:1
-prepEu	../Electric\PowerFlowCaculation.py	/^        def prepEu():#预处理有理想电源的节点电压方程组参数$/;"	kind:function	line:64
 setUp	../Electric\PFCTest.py	/^    def setUp(self):$/;"	kind:member	line:6
 test.py	../Electric\test.py	1;"	kind:file	line:1
+testTree	../Electric\PFCTest.py	/^    def testTree(self):$/;"	kind:member	line:127
+testTree1	../Electric\PFCTest.py	/^    def testTree1(self):$/;"	kind:member	line:164
 test_S_Caculate	../Electric\PFCTest.py	/^    def test_S_Caculate(self):$/;"	kind:member	line:72
 test_Z_Caculate	../Electric\PFCTest.py	/^    def test_Z_Caculate(self):$/;"	kind:member	line:32
 test_Z_Caculate1	../Electric\PFCTest.py	/^    def test_Z_Caculate1(self):$/;"	kind:member	line:52
+test_preu_caculate	../Electric\PFCTest.py	/^    def test_preu_caculate(self):$/;"	kind:member	line:92
 testaddelement	../Electric\PFCTest.py	/^    def testaddelement(self):$/;"	kind:member	line:15
 testaddelements	../Electric\PFCTest.py	/^    def testaddelements(self):$/;"	kind:member	line:22
-testcreate	../Electric\PFCTest.py	/^    def testcreate(self):$/;"	kind:member	line:94
+testcreate	../Electric\PFCTest.py	/^    def testcreate(self):$/;"	kind:member	line:204
+testprepeu	../Electric\PFCTest.py	/^    def testprepeu(self):$/;"	kind:member	line:185
+tn	../Electric\PFCTest.py	/^from PowerFlowCaculation import PFC, ElectricElement as ee, EType,TreeNode as tn$/;"	kind:namespace	line:2
 unique	../Electric\PowerFlowCaculation.py	/^from enum import Enum,unique$/;"	kind:namespace	line:2
 unittest	../Electric\PFCTest.py	/^import unittest$/;"	kind:namespace	line:1
