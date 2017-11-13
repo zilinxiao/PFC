@@ -1,5 +1,5 @@
 import unittest
-from PowerFlowCaculation import PFC, ElectricElement as ee, EType
+from PowerFlowCaculation import PFC, ElectricElement as ee, EType,TreeNode as tn
 import numpy as np
 class PFCUnitTest(unittest.TestCase):
     '''PFC类单元测试'''
@@ -123,6 +123,83 @@ class PFCUnitTest(unittest.TestCase):
             self.assertTrue(False)
         except Exception as e:
            self.assertEqual(e.args[0],'有并联的理想电压源')
+
+    def testTree(self):
+        elements = [ee.createDcY(0,(0,-1),1),ee.createDcEu(1,(0,1),2),
+            ee.createDcEu(2,(1,-1),-2),ee.createDcEu(3,(1,2),2),
+            ee.createDcEu(4,(2,-1),2),ee.createDcY(5,(2,3),1),
+            ee.createDcY(6,(3,-1),1),ee.createDcEu(7,(3,4),2),
+            ee.createDcY(8,(4,-1),1),ee.createDcEu(9,(4,5),2),
+            ee.createDcY(10,(5,-1),1),ee.createDcY(11,(5,6),1),
+            ee.createDcY(12,(6,-1),1),ee.createDcEu(13,(6,7),1),
+            ee.createDcEu(14,(-1,7),2)]
+        s = {(min(e.ids),max(e.ids)) for e in elements}
+        print(s)
+        if len(s) == len(elements):
+            print(True)
+        else:
+            print(False)
+            return 
+        eus = filter(lambda e:e.eType == EType.Eu and min(e.ids) == -1,elements)
+        eus1 = filter(lambda e:e.eType == EType.Eu and min(e.ids) != -1,elements)
+        for e in eus:
+            print(e)
+        print("")
+        for e in eus1:
+            print(e)
+        print("")
+        def f(e):
+            if e.ids[0] > e.ids[1]:
+                if e.eType == EType.Eu:
+                    e.u = -e.u
+                elif e.eType == EType.Ei:
+                    e.i = -e.i
+                e.ids= e.ids[1],e.ids[0]
+            return e
+        elements =  map(f,elements)
+        elements = sorted(elements, key = lambda e:(max(e.ids),min(e.ids)))
+        for e in elements:
+            print(e)
+
+    def testTree1(self):
+        elements = [ee.createAcY(0,(0,-1),complex(1)),ee.createAcEu(1,(0,1),complex(2)),
+            ee.createAcEu(2,(1,-1),complex(-2)),ee.createAcEu(3,(1,2),complex(2)),
+            ee.createAcEu(4,(2,-1),complex(2)),ee.createAcY(5,(2,3),complex(1)),
+            ee.createAcY(6,(3,-1),complex(1)),ee.createAcEu(7,(3,4),complex(2)),
+            ee.createAcY(8,(4,-1),complex(1)),ee.createAcEu(9,(4,5),complex(2)),
+            ee.createAcY(10,(5,-1),complex(1)),ee.createAcY(11,(5,6),complex(1)),
+            ee.createAcY(12,(6,-1),complex(1)),ee.createAcEu(13,(6,7),complex(2)),
+            ee.createAcEu(14,(-1,7),complex(2))]
+        def f(e):
+            if e.ids[0] > e.ids[1]:
+                if e.eType == EType.Eu:
+                    e.u = -e.u
+                elif e.eType == EType.Ei:
+                    e.i = -e.i
+                e.ids= e.ids[1],e.ids[0]
+            return e
+        elements =  map(f,elements)
+        elements = sorted(elements, key = lambda e:(max(e.ids),min(e.ids)))
+        for e in elements:
+            print(e)
+    def testprepeu(self):
+         elements = [ee.createDcY(0,(0,-1),1),ee.createDcEu(1,(0,1),2),
+            ee.createDcEu(2,(1,-1),-2),ee.createDcEu(3,(1,2),2),
+            ee.createDcEu(4,(2,-1),2),ee.createDcY(5,(2,3),1),
+            ee.createDcY(6,(3,-1),1),ee.createDcEu(7,(3,4),2),
+            ee.createDcY(8,(4,-1),1),ee.createDcEu(9,(4,5),2),
+            ee.createDcY(10,(5,-1),1),ee.createDcY(11,(5,6),1),
+            ee.createDcY(12,(6,-1),1),ee.createDcEu(13,(6,7),1),
+            ee.createDcEu(14,(-1,7),2)]
+        eus = [e for e in elements if e.eType == EType.Eu]
+        def findParallelEu(eus):
+            eus = eus[:]
+            for e in eus:
+                findeus()
+            def findeus(eus):
+                isfindeus = list()
+                def next():
+                    
 class ElectricElementUnitTest(unittest.TestCase):
     def testcreate(self):
         e1 = ee(EType.Y,1,(0,1),10,0,0,0)
