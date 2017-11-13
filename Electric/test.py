@@ -33,14 +33,17 @@ def f2(eus):
                     
     return False
 
-print(f1(eus))
+#print(f1(eus))
 
-print(f2(eus))
+#print(f2(eus))
 
 eus = [(7,8),(2,4),(5,3),(1,4),(-1,2),(6,5)]
-def findEusTree(eus):
-    eus = eus[:]
-    isfind = list()
-    earthEus = [e for e in eus if -1 in eus]
-    for e in earthEus:
-        
+def findEusTree(eus,e,e1):
+    e.extend(eus[0:3])
+    e1 = eus[0:3]
+e ,e1 =[],[]
+findEusTree(eus,e,e1)
+print(eus)
+print(e)
+print(e1)
+
