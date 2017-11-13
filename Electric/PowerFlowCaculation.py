@@ -95,10 +95,8 @@ class PFC(object):
                     if not has :break
             return False
         if findeus(eus): raise Exception("有并联的理想电压源")
-
         eus.sort(key=lambda x:(max(x.ids),min(x.ids) == -1,min(x.ids)))
         unodes = dict()#保存节点理想电压源及节点电压
-
         def geteus(eus):
             while(True):
                 for e in eus:#查找并保存与以参考节点为节点理想电压源及其相连的理想电压源的的节点列表
@@ -107,7 +105,6 @@ class PFC(object):
                         unodes[-1] = {node:e.u}
                         eus.pop(eus.index(e))
                         funodes(node)
-
         unodes1 = list()#保存不以参考节点为节点的理想电压及其相邻节点
         for e in eus:#查找并保存剩余理想电压源节点及节点电压
             if not e.ids[0] in unodes.keys() and not e.ids[1] in unodes.keys():

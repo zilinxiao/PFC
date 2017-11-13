@@ -1,12 +1,4 @@
 import copy
-<<<<<<< HEAD
-
-def f1():
-    eus = [(7,8),(2,4),(2,3),(1,3),(-1,2),(1,5)]
-    def findeus(eus1):#查找是否有并联理想电压源
-        for i in eus1:#查找是否有间接并联理想电压源
-            eus1.pop(eus1.index(i))
-=======
 eus = [(7,8),(2,4),(5,3),(1,4),(1,2),(6,5)]
 def f1(eus):
     eus1 = eus[:]
@@ -31,7 +23,6 @@ def f2(eus):
     for i in eus:
         if i not in isfind:
             isfind.append(i)
->>>>>>> 96ed8521bbe47397814e241ab0cb776d67eff51b
             l = [i[0],i[1]]
             for j in eus:
                 if j not in isfind:
@@ -42,42 +33,11 @@ def f2(eus):
                     
     return False
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-    print(findeus(eus))
-    eus.sort(key=lambda x:(max(x),min(x)))
-    for i in eus:
-        print(i)
-        
-a=[5,1,2,5,5,4,5,4,5,5,5]
-while(True):
-    remove = False
-    for i in a:
-        if i == 5:
-            a.pop(a.index(i))
-            remove = True
-            break
-    if not remove: break
-reduce
-print(a)
-=======
-print(f1(eus))
-=======
 #print(f1(eus))
->>>>>>> e5e5ff6c4e61dd5eb073aba563bdbb17bff7e36a
 
 #print(f2(eus))
 
 eus = [(7,8),(2,4),(5,3),(1,4),(-1,2),(6,5)]
-<<<<<<< HEAD
-def findEusTree(eus):
-    eus = eus[:]
-    isfind = list()
-    earthEus = [e for e in eus if -1 in eus]
-    for e in earthEus:
-        
->>>>>>> 96ed8521bbe47397814e241ab0cb776d67eff51b
-=======
 def findEusTree(eus,e,e1):
     e.extend(eus[0:3])
     e1 = eus[0:3]
@@ -86,5 +46,3 @@ findEusTree(eus,e,e1)
 print(eus)
 print(e)
 print(e1)
-
->>>>>>> e5e5ff6c4e61dd5eb073aba563bdbb17bff7e36a
