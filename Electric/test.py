@@ -1,4 +1,5 @@
 import copy
+
 def f1():
     eus = [(7,8),(2,4),(2,3),(1,3),(-1,2),(1,5)]
     def findeus(eus1):#查找是否有并联理想电压源
@@ -23,7 +24,6 @@ def f1():
         print(i)
         
 a=[5,1,2,5,5,4,5,4,5,5,5]
-
 while(True):
     remove = False
     for i in a:
@@ -32,4 +32,5 @@ while(True):
             remove = True
             break
     if not remove: break
+reduce
 print(a)
