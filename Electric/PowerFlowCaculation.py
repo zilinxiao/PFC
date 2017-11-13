@@ -135,7 +135,25 @@ class PFC(object):
                         if j.ids[0] in l or j.ids[1] in l:
                             l +=[j.ids[0],j.ids[1]]
                             isfind.append(j)
+    def __findEarthEu(eus):
+        '''查找接地理想电压源及与之相连的理想电压源'''
+        eus = eus[:]
+        earthEus = [e for e in eus if -1 in e.ids]#直接接地的理想电压源列表
+        isfind = earthEus[:]#已经查找过点元件列表
 
+    def __findChildsU(eus,eu,nodeId,nodeU,nodesU):
+        '''在eus列表中查找与eu理想电源相连的其它理想电压源列表'''
+        childs = [e for e in eus if e != eu and nodeId in e.ids]
+        nodesU += {(c.ids[0] if c.ids[0] != nodeId) :(nodeU + (c.U if c.ids[0] == nodeId else -c.U),c)
+            for c in childs}
+        eus = [e for e in eus if e not in childs]
+        for  i in childs:
+            __findChildsU(eus)
+        
+
+
+
+                
 
     def __iteration(self,isFirst):
         isIter = False#是否需要继续迭代，FALSE表示迭代结束，TRUE表示继续迭代

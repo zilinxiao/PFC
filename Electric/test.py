@@ -43,6 +43,7 @@ def f2(eus):
     return False
 
 <<<<<<< HEAD
+<<<<<<< HEAD
     print(findeus(eus))
     eus.sort(key=lambda x:(max(x),min(x)))
     for i in eus:
@@ -61,10 +62,14 @@ reduce
 print(a)
 =======
 print(f1(eus))
+=======
+#print(f1(eus))
+>>>>>>> e5e5ff6c4e61dd5eb073aba563bdbb17bff7e36a
 
-print(f2(eus))
+#print(f2(eus))
 
 eus = [(7,8),(2,4),(5,3),(1,4),(-1,2),(6,5)]
+<<<<<<< HEAD
 def findEusTree(eus):
     eus = eus[:]
     isfind = list()
@@ -72,3 +77,14 @@ def findEusTree(eus):
     for e in earthEus:
         
 >>>>>>> 96ed8521bbe47397814e241ab0cb776d67eff51b
+=======
+def findEusTree(eus,e,e1):
+    e.extend(eus[0:3])
+    e1 = eus[0:3]
+e ,e1 =[],[]
+findEusTree(eus,e,e1)
+print(eus)
+print(e)
+print(e1)
+
+>>>>>>> e5e5ff6c4e61dd5eb073aba563bdbb17bff7e36a
