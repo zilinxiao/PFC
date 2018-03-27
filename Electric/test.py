@@ -33,11 +33,11 @@ def f2(eus):
                     
     return False
 
-#print(f1(eus))
+print(f1(eus))
 
-#print(f2(eus))
+print(f2(eus))
 
-eus = [(7,8),(2,4),(5,3),(1,4),(-1,2),(6,5)]
+eus = [(7,8),(2,4),(5,3),(1,4),(-1,2),(6,-5)]
 def findEusTree(eus,e,e1):
     e.extend(eus[0:3])
     e1 = eus[0:3]
@@ -46,3 +46,19 @@ findEusTree(eus,e,e1)
 print(eus)
 print(e)
 print(e1)
+print([True if 1 in e else False for e in eus ])
+print(all([True if 1 in e else False for e in eus ]))
+print(any([True if 1 in e else False for e in eus ]))
+t = list()
+[t.extend(list(e)) for e in eus]
+print(t)
+print(set(t))
+
+eus=[(-1,1),(-1,2),(-1,3),(-1,4)]
+t = list()
+[t.extend(list(e)) for e in eus]
+print(set(t))
+print(all([True if -1 in e else False for e in eus ]))
+print(len(set(t))== len(eus)+1)
+print(set(eus[0]) & set(eus[1]))
+print([e for e in eus if 100 in e])

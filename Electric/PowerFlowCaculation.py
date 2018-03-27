@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import numpy as np
 from enum import Enum,unique
 import math as mh
@@ -60,7 +61,7 @@ class PFC(object):
         '''
         num = 0;isFirst = True
         eus = [e for e in self.electricElements if e.eType == EType.Eu]#理想电压源列表
-        self.__prepEu(eus)#预处理
+        #self.__prepEu(eus)#预处理
 
         '''解节点电压方程组'''
         while self.__iteration(isFirst) and num <= self.numOfIterations:
@@ -75,82 +76,42 @@ class PFC(object):
             num += 1
             isFirst = False
         return (self.U,self.Y,self.I)
-    def __prepEu(self,eus):#预处理有理想电源的节点电压方程组参数
-        if __findParallelEu(eus) raise PFCErr(PFCErrCode.HasParallelEu,'电路中含有并联理想电压源或者环接理想电压源')
-        '''
-        def findeus(eus):#查找是否有并联理想电压源
-            eus1 = copy.copy(eus)
-            for i in eus1:
-                eus1.pop(eus1.index(i))
-                l = [i.ids[0],i.ids[1]]
-                while(True):
-                    has = False
-                    for j in eus1:
-                        if j.ids[0] in l and j.ids[1] in l: return True
-                        if j.ids[0] in l or j.ids[1] in l:
-                            l +=[j.ids[0],j.ids[1]]
-                            eus1.pop(eus1.index(j))
-                            has = True
-                            break
-                    if not has :break
-            return False
-        if findeus(eus): raise Exception("有并联的理想电压源")
-        eus.sort(key=lambda x:(max(x.ids),min(x.ids) == -1,min(x.ids)))
-        unodes = dict()#保存节点理想电压源及节点电压
-        def geteus(eus):
-            while(True):
-                for e in eus:#查找并保存与以参考节点为节点理想电压源及其相连的理想电压源的的节点列表
-                    if min(e.ids) == -1:#查找以参考节点为节点的理想电压源的理想电压源列表
-                        node = max(e.ids)
-                        unodes[-1] = {node:e.u}
-                        eus.pop(eus.index(e))
-                        funodes(node)
-        unodes1 = list()#保存不以参考节点为节点的理想电压及其相邻节点
-        for e in eus:#查找并保存剩余理想电压源节点及节点电压
-            if not e.ids[0] in unodes.keys() and not e.ids[1] in unodes.keys():
-                unodes[e.ids[1]] =e.u
-                funodes(e.ids[1])
-        def funodes(node):#查找与给定理想电压源相连的理想电压源列表
-            for n in eus:
-                if node in n.ids and\
-                not ((n.ids[0] if n.ids[0] == node else n.ids[1])in unodes.keys()):
-                    nd = {n.ids[1],n.u} if n.ids[0] == node else {n.ids[0],-e.u}
-                    unodes.items.append(nd)
-                    funodes(nd)
-        '''    
-    def __findParallelEu(eus):
-        '''查找电路中是否有并联理想电压源或者环接理想电压源'''
-        eus = eus[:]
-        isfind = list()#已经查找过得元件
-        for i in eus:
-            if i not in isfind:
-                isfind.append(i)
-                l = [i.ids[0],i.ids[1]]
-                for j in eus:
-                    if j not in isfind:
-                        if j.ids[0] in l and j.ids[1] in l:return True
-                        if j.ids[0] in l or j.ids[1] in l:
-                            l +=[j.ids[0],j.ids[1]]
-                            isfind.append(j)
-    def __findEarthEu(eus):
-        '''查找接地理想电压源及与之相连的理想电压源'''
-        eus = eus[:]
-        earthEus = [e for e in eus if -1 in e.ids]#直接接地的理想电压源列表
-        isfind = earthEus[:]#已经查找过点元件列表
-
-    def __findChildsU(eus,eu,nodeId,nodeU,nodesU):
-        '''在eus列表中查找与eu理想电源相连的其它理想电压源列表'''
-        childs = [e for e in eus if e != eu and nodeId in e.ids]
-        nodesU += {(c.ids[0] if c.ids[0] != nodeId) :(nodeU + (c.U if c.ids[0] == nodeId else -c.U),c)
-            for c in childs}
-        eus = [e for e in eus if e not in childs]
-        for  i in childs:
-            __findChildsU(eus)
-        
+    def __prepEu(self,eus):
+        """
+        函数功能：
+        理想电压源的预处理程序，分为几种情况进行处理
+        1、所有理想电压的一个节点均为参考节点-1，另一个节点均不一样，另一个节点电压为所
+        在理想电压源电压，返回一个所有理想电压源对应节点的电压列表；
+        2、所有理想电压源的一个节点未同一个节点n,另一个节点均不一样，则设节点n的电压为Un，
+        另一个节点电压为Un+所在理想电压源电压，返回一个所有理想电压源对应节点的电压列表
+        3、其它情况则以后实现，返回未实现异常。
+        参数表：
+        -----
+        eus:理想电压源列表
+        返回值：理想电压源节点电压列表，比如节点列表n1,n2,n3...,对应的电压列表[(n1,u1),(n2,u2)...]
+        """
+        if len(eus) == 0 :return None #无理想电压源
+        elif len(eus) == 1:           #只有一个理想电压源
+            if -1 in eus[0].ids:
+                return -1,[(eueus[0].ids[1],eus[0].u) if eus[0].ids[0] == -1 else (eus[0].ids[0],-eus[0].u)]
+            else 
+                return eus[0].ids[0],[(eus[0].ids[1],eus[0].u)]
+        #有两个以上的理想电压源
+        #所有理想电压源均有一个共同的节点
+        l =[]
+        [l.extend(list(e.ids)) for e in eus]
+        s = set(l)
+        if len(s) == len(eus)+1:
+            #第一种情况处理
+            if -1 in s:
+                return -1, [(e.ids[1],e.u) if e.ids[0] == -1 else (e.ids[0],-e.u) for e in eus]
+            #第二种情况处理
+            elif:
+                n = eus[0].ids & eus[1].ids
+                return n, [(e.ids[1],e.u) if e.ids[0] == n else (e.ids[0],-e.u) for e in eus]
 
 
-
-                
+            
 
     def __iteration(self,isFirst):
         isIter = False#是否需要继续迭代，FALSE表示迭代结束，TRUE表示继续迭代
@@ -237,7 +198,7 @@ class TreeNode(object):
     def addChild(self,*data):
         self.childs = list()
         for d in data:
-            self.childs.append(Node(d))
+            self.childs.append(TreeNode(d))
 
 class PFCErr(Exception):
     def __init__(self,errCode,msg):
