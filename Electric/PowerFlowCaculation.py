@@ -6,11 +6,11 @@ import copy
 class PFC(object):
     '''潮流计算类PFC'''
     # electricElementsCount = 0
-    def __init__(self, numOfIterations=100, voltageOfIterator=1):
+    def __init__(self, numOfIterations=100, voltageOfIterator=1,elments = list()):
         '''初始化函数'''
         self.numOfIterations = numOfIterations
         self.voltageOfIterator = voltageOfIterator
-        self.electricElements = list()
+        self.electricElements = elments
     def addElement(self, elements):
         '''添加一个元件，可以是一个元件或者元件列表，注意元件参考节点编号为-1，其它均大于-1
         elements={"eType":'Y', "id":0, "ids":(0,1), "Y":1, "U":1, "I"=1}或者
@@ -55,15 +55,24 @@ class PFC(object):
         self.U = np.mat(np.zeros((N,1),dtype=type))
         self.I = np.mat(np.zeros((N,1),dtype=type))
     def caculate(self):
-        '''
-        求解电路节点电压方程组，求解时，需要进行迭代计算，直到满足迭代精度或者达到迭代次数才结束。
-        返回值(self.U,self.Y,self.I)
-        '''
+        """函数功能：潮流计算，求解节点电压方程组
+        求解电路节点电压方程组，求解时，需要进行迭代计算，
+        直到满足迭代精度或者达到迭代次数才结束。
+        包含两种电路类型，一种是不含理想电压源的常规电路；
+        一种是包含理想电压源电路，这种需进行预处理。
+        返回值：
+        ------
+        (self.U,self.Y,self.I)
+        """
         num = 0;isFirst = True
         eus = [e for e in self.electricElements if e.eType == EType.Eu]#理想电压源列表
-        #self.__prepEu(eus)#预处理
+        if len(eus) > 0:#对包含电压源的电路进行预处理
+            baseId,nodeUList =  self.__prepEu(eus)
+            if baseId != -1:#对包含不是以-1为公共节点的电压源进行预处理
+                self.__exchangeBaseId(baseId)
 
-        '''解节点电压方程组'''
+
+        #解节点电压方程组
         while self.__iteration(isFirst) and num <= self.numOfIterations:
             if len(eus) <= 0:self.U = np.linalg.solve(self.Y,self.I)#无理想电压源
             else:
@@ -90,11 +99,10 @@ class PFC(object):
         eus:理想电压源列表
         返回值：理想电压源节点电压列表，比如节点列表n1,n2,n3...,对应的电压列表[(n1,u1),(n2,u2)...]
         """
-        if len(eus) == 0 :return None #无理想电压源
-        elif len(eus) == 1:           #只有一个理想电压源
+        if len(eus) == 1:           #只有一个理想电压源
             if -1 in eus[0].ids:
-                return -1,[(eueus[0].ids[1],eus[0].u) if eus[0].ids[0] == -1 else (eus[0].ids[0],-eus[0].u)]
-            else 
+                return -1,[(eus[0].ids[1],eus[0].u) if eus[0].ids[0] == -1 else (eus[0].ids[0],-eus[0].u)]
+            else:
                 return eus[0].ids[0],[(eus[0].ids[1],eus[0].u)]
         #有两个以上的理想电压源
         #所有理想电压源均有一个共同的节点
@@ -106,9 +114,34 @@ class PFC(object):
             if -1 in s:
                 return -1, [(e.ids[1],e.u) if e.ids[0] == -1 else (e.ids[0],-e.u) for e in eus]
             #第二种情况处理
-            elif:
+            else:
                 n = eus[0].ids & eus[1].ids
                 return n, [(e.ids[1],e.u) if e.ids[0] == n else (e.ids[0],-e.u) for e in eus]
+        else: raise NotImplementedError("""潮流计算程序实现了包含一个理想电压源的电路，
+            以及多个理想电压源电路中所有理想电压源均只有一个公共节点，其它情况未实现""")
+    def __exchangeBaseId(self,baseId):
+        """函数功能
+        处理包含公共节点不是-1的电压源预处理函数
+        把电路各元件中的节点号为-1,baseId相互交换
+        参数表：
+        ------
+        baseId:电压源的公共节点
+        无返回值。
+        """
+        #找出节点号为-1的电路元件，并替把节点号-1替换为baseId
+        baseIdelemets = [e for e in self.electricElements if -1 in e.ids]
+        for i in range(len(baseIdelemets)):
+            ids = baseIdelemets[i].ids
+            if baseId not in  baseIdelemets[i].ids:
+                baseIdelemets[i].ids = (baseId,ids[1]) if ids[0] == -1 else (ids[0],baseId)
+            else:baseIdelemets.ids = (ids[1],ids[0])
+        #找出节点号为baseId的电路元件，并替把节点号baseId替换为-1
+        baseIdelemets = [e for e in self.electricElements if baseId in e.ids]
+        for i in range(len(baseIdelemets)):
+            ids = baseIdelemets[i].ids
+            if -1 not in  baseIdelemets[i].ids:
+                baseIdelemets[i].ids = (-1,ids[1]) if ids[0] == baseId else (ids[0],-1)
+        self.createYIMatrix()
 
 
             

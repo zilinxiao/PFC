@@ -62,3 +62,15 @@ print(all([True if -1 in e else False for e in eus ]))
 print(len(set(t))== len(eus)+1)
 print(set(eus[0]) & set(eus[1]))
 print([e for e in eus if 100 in e])
+a = [e for e in range(10)]
+print(a)
+for e in a:
+    if e == 5: e = 30
+print(a)
+for i in range(len(a)):
+    if i == 7: a[i] = 30
+print(a)
+
+b = (1,2)
+b[0] = 3
+print(b)
