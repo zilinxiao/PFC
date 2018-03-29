@@ -1,4 +1,5 @@
 import copy
+import numpy as np
 eus = [(7,8),(2,4),(5,3),(1,4),(1,2),(6,5)]
 def f1(eus):
     eus1 = eus[:]
@@ -71,6 +72,19 @@ for i in range(len(a)):
     if i == 7: a[i] = 30
 print(a)
 
-b = (1,2)
-b[0] = 3
+a=np.arange(0,20).reshape(4,5)
+print(a)
+b = np.arange(1,5).reshape(4,1)
 print(b)
+print(a[:,(0,2)])
+print(b[2])
+print(a[:,2]*b[2])
+c = [1,4,2,-1,10,49]
+c.sort()
+print(c)
+print(eus.sort(key=lambda x:x[1],reverse=True))
+print(eus)
+
+
+eus=[(-2,2),(-1,1),(-1,3)]
+print(len(set(eus[0]) & set(eus[1])))

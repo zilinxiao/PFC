@@ -6,11 +6,11 @@ import copy
 class PFC(object):
     '''潮流计算类PFC'''
     # electricElementsCount = 0
-    def __init__(self, numOfIterations=100, voltageOfIterator=1,elments = list()):
+    def __init__(self, numOfIterations=100, voltageOfIterator=1):
         '''初始化函数'''
         self.numOfIterations = numOfIterations
         self.voltageOfIterator = voltageOfIterator
-        self.electricElements = elments
+        self.electricElements = list()
     def addElement(self, elements):
         '''添加一个元件，可以是一个元件或者元件列表，注意元件参考节点编号为-1，其它均大于-1
         elements={"eType":'Y', "id":0, "ids":(0,1), "Y":1, "U":1, "I"=1}或者
@@ -65,26 +65,36 @@ class PFC(object):
         (self.U,self.Y,self.I)
         """
         num = 0;isFirst = True
+        #理想电压源处理
         eus = [e for e in self.electricElements if e.eType == EType.Eu]#理想电压源列表
-        if len(eus) > 0:#对包含电压源的电路进行预处理
-            baseId,nodeUList =  self.__prepEu(eus)
-            if baseId != -1:#对包含不是以-1为公共节点的电压源进行预处理
-                self.__exchangeBaseId(baseId)
-
-
-        #解节点电压方程组
+        
+        """解节点电压方程组"""
+        #保存原电路Y，I,U矩阵
+        Y = self.Y[:,:]
+        I = self.I[:,:]
+        U = self.U[:,:]
+        #包含理想电压源的电路的理想电压节点编号ids1及非理想电压源节点编号列表ids2
+        ids1=[]
+        ids2=[]
         while self.__iteration(isFirst) and num <= self.numOfIterations:
-            if len(eus) <= 0:self.U = np.linalg.solve(self.Y,self.I)#无理想电压源
-            else:
-                if isFirst:
-                    for e in eus:
-                        if e.ids[0] == -1 or e.ids[1] == -1:
-                            pass
-                        elif True:
-                            pass
+            if isFirst and len(eus) >0: #对包含电压源的电路进行预处理
+                baseId,nodeUList =  self.__prepEu(eus)
+                if baseId != -1:#对包含不是以-1为公共节点的电压源进行预处理
+                    self.__changeBaseId(baseId)
+                ids1,ids2 = self.__createEuYI(nodeUList)#处理包含理想电压源的节点电压方程组
+                for n in nodeUList:#理想电压源节点的电压直接计算完毕
+                    U[n[0]] = n[1]
+            self.U = np.linalg.solve(self.Y,self.I)
             num += 1
             isFirst = False
-        return (self.U,self.Y,self.I)
+        """求解节点电压方程组后，再把理想电压源结果填写到Y，U，I中"""
+        if len(eus) >0:
+            for id in ids2:
+                U[id] = self.U[ids2.index(id)]
+            self.U = U
+            self.I = Y*U
+            self.Y = Y
+        return self.U,self.Y,self.I
     def __prepEu(self,eus):
         """
         函数功能：
@@ -97,7 +107,10 @@ class PFC(object):
         参数表：
         -----
         eus:理想电压源列表
-        返回值：理想电压源节点电压列表，比如节点列表n1,n2,n3...,对应的电压列表[(n1,u1),(n2,u2)...]
+        返回值:baseId,[(n1,u1),(n2,u2)...]
+        ------
+        baseId:理想电压源的公共节点
+        [(n1,u1),(n2,u2)...]：理想电压源节点电压列表
         """
         if len(eus) == 1:           #只有一个理想电压源
             if -1 in eus[0].ids:
@@ -106,20 +119,20 @@ class PFC(object):
                 return eus[0].ids[0],[(eus[0].ids[1],eus[0].u)]
         #有两个以上的理想电压源
         #所有理想电压源均有一个共同的节点
-        l =[]
-        [l.extend(list(e.ids)) for e in eus]
-        s = set(l)
-        if len(s) == len(eus)+1:
-            #第一种情况处理
-            if -1 in s:
-                return -1, [(e.ids[1],e.u) if e.ids[0] == -1 else (e.ids[0],-e.u) for e in eus]
-            #第二种情况处理
-            else:
-                n = eus[0].ids & eus[1].ids
-                return n, [(e.ids[1],e.u) if e.ids[0] == n else (e.ids[0],-e.u) for e in eus]
-        else: raise NotImplementedError("""潮流计算程序实现了包含一个理想电压源的电路，
+        baseId = set(eus[0].ids) & set(eus[1].ids)
+        if(len(baseId) == 1):
+            bid = baseId.pop()
+            if all([True if bid in e.ids else False for e in eus]):
+                #第一种情况处理
+                if -1 == bid:
+                    return -1, [(e.ids[1],e.u) if e.ids[0] == -1 else (e.ids[0],-e.u) for e in eus]
+                #第二种情况处理
+                else:
+                    n = eus[0].ids & eus[1].ids
+                    return n, [(e.ids[1],e.u) if e.ids[0] == n else (e.ids[0],-e.u) for e in eus]
+        raise NotImplementedError("""潮流计算程序实现了包含一个理想电压源的电路，
             以及多个理想电压源电路中所有理想电压源均只有一个公共节点，其它情况未实现""")
-    def __exchangeBaseId(self,baseId):
+    def __changeBaseId(self,baseId):
         """函数功能
         处理包含公共节点不是-1的电压源预处理函数
         把电路各元件中的节点号为-1,baseId相互交换
@@ -142,9 +155,34 @@ class PFC(object):
             if -1 not in  baseIdelemets[i].ids:
                 baseIdelemets[i].ids = (-1,ids[1]) if ids[0] == baseId else (ids[0],-1)
         self.createYIMatrix()
-
-
-            
+    def __createEuYI(self,nodeUList):
+        """
+        函数功能：处理包含理想电压源的线性方程组矩阵Y，I
+        导纳矩阵Y中把理想电压源节点编号所在行，列去除，
+        电流矩阵I中减去理想电压源节点电压*对应列的导纳
+        eg.  YU=I,
+        _                _ __   __       
+        |Y11 Y12 Y13...Y1n||U1| |I1|      _            _ __  _       _
+        |Y21 Y22 Y23...Y2n||U2| |I2|     |Y22 Y23...Y2n||U2| |I2-Y21U1|
+        |...              |... =...  --->|...          |... =|...     |
+        |Yn1 Yn2 Yn3...Ynn||Un| |In|     |Yn2 Yn3...Ynn||Un| |In-Yn1U1|
+        _                _  __   __      _             _ __  _       _
+        参数表：
+        ------
+        nodeUList:理想电压源节点电压列表[(nid1,u1),(nid2,u2)...]
+        返回值：ids1,ids2,Y,I
+        ------
+        ids1: 理想电压源节点编号列表[id11,id12...]
+        ids2: 剩下节点编号列表[id21,id22....]
+        """
+        nl = sorted(nodeUList, key=lambda x:x[0])
+        for n in nl:
+            self.I -= self.Y[:,n[0]]*n[1]
+        ids1 = [n[0] for n in nl]
+        ids2 = [n for n in np.arange(len(self.I)) if n not in ids1]
+        self.Y = self.Y[:,ids2][ids2,:]
+        self.I = self.I[ids2]
+        return ids1,ids2
 
     def __iteration(self,isFirst):
         isIter = False#是否需要继续迭代，FALSE表示迭代结束，TRUE表示继续迭代

@@ -42,9 +42,9 @@ class PFCUnitTest(unittest.TestCase):
             #print(np.mat(pfc.Y)*np.mat(pfc.U))
             self.assertTrue(np.all(np.abs(pfc.Y*pfc.U - pfc.I <\
             np.mat(np.ones(pfc.I.shape))*1e-10)))
-            self.assertTrue(np.all(pfc.U==np.array([-10.6,-5.6,-1.2]).reshape(3,1)))
-            self.assertTrue(np.all(pfc.I==np.array([-5,0,1.0]).reshape(3,1)))
-            self.assertTrue(np.all(pfc.Y==np.array([1.0,-1.0,0,-1.0,2.0,-0.5,0.0,-0.5,1.5]).reshape(3,3)))
+            self.assertTrue(np.all(pfc.U == np.array([-10.6,-5.6,-1.2]).reshape(3,1)))
+            self.assertTrue(np.all(pfc.I == np.array([-5,0,1.0]).reshape(3,1)))
+            self.assertTrue(np.all(pfc.Y == np.array([1.0,-1.0,0,-1.0,2.0,-0.5,0.0,-0.5,1.5]).reshape(3,3)))
             '''print(pfc.U)
             print(pfc.Y)
             print(pfc.I)'''
@@ -107,7 +107,7 @@ class PFCUnitTest(unittest.TestCase):
             pfc.caculate()
             #self.assertTrue(False)
         except Exception as e:
-           self.assertEqual(e.args[0],'有并联的理想电压源')
+           print("test_preu_caculate 引发异常："+ e.args[0])
         try:
             pfc = PFC()
             elements = [ee.createDcY(0,(0,-1),1),ee.createDcEu(1,(0,1),2),
@@ -123,7 +123,27 @@ class PFCUnitTest(unittest.TestCase):
             pfc.caculate()
             #self.assertTrue(False)
         except Exception as e:
-           self.assertEqual(e.args[0],'有并联的理想电压源')
+           print("test_preu_caculate 引发异常："+ e.args[0])
+    def test_Eu_caculate(self):
+        try:
+            pfc = PFC()
+            elements = [ee.createDcEu(1,(0,-1),-5),ee.createDcY(2,(0,1),1),
+                ee.createDcY(3,(-1,1),1/2.0),ee.createDcY(4,(1,2),1/2.0),
+                ee.createDcY(5,(2,-1),1/1.0),ee.createDcEu(6,(-1,2),1)]
+            pfc.addElement(elements)
+            pfc.createYIMatrix()
+            pfc.caculate()
+            #print(np.mat(pfc.Y)*np.mat(pfc.U))
+            self.assertTrue(np.all(np.abs(pfc.Y*pfc.U - pfc.I <\
+            np.mat(np.ones(pfc.I.shape))*1e-10)))
+            self.assertTrue(np.all(pfc.U == np.array([5,2.75,1]).reshape(3,1)))
+            self.assertTrue(np.all(pfc.I == np.array([2.25,0,0.125]).reshape(3,1)))
+            self.assertTrue(np.all(pfc.Y == np.array([1.0,-1.0,0,-1.0,2.0,-0.5,0.0,-0.5,1.5]).reshape(3,3)))
+            '''print(pfc.U)
+            print(pfc.Y)
+            print(pfc.I)'''
+        except Exception as e:
+            print(e)
 
     def testTree(self):
         elements = [ee.createDcY(0,(0,-1),1),ee.createDcEu(1,(0,1),2),
@@ -135,20 +155,23 @@ class PFCUnitTest(unittest.TestCase):
             ee.createDcY(12,(6,-1),1),ee.createDcEu(13,(6,7),1),
             ee.createDcEu(14,(-1,7),2)]
         s = {(min(e.ids),max(e.ids)) for e in elements}
+        '''
         print(s)
         if len(s) == len(elements):
             print(True)
         else:
             print(False)
-            return 
+            return
+        '''
         eus = filter(lambda e:e.eType == EType.Eu and min(e.ids) == -1,elements)
         eus1 = filter(lambda e:e.eType == EType.Eu and min(e.ids) != -1,elements)
-        for e in eus:
+        '''for e in eus:
             print(e)
         print("")
         for e in eus1:
             print(e)
         print("")
+        '''
         def f(e):
             if e.ids[0] > e.ids[1]:
                 if e.eType == EType.Eu:
@@ -159,8 +182,8 @@ class PFCUnitTest(unittest.TestCase):
             return e
         elements =  map(f,elements)
         elements = sorted(elements, key = lambda e:(max(e.ids),min(e.ids)))
-        for e in elements:
-            print(e)
+        #for e in elements:
+        #    print(e)
 
     def testTree1(self):
         elements = [ee.createAcY(0,(0,-1),complex(1)),ee.createAcEu(1,(0,1),complex(2)),
@@ -181,8 +204,9 @@ class PFCUnitTest(unittest.TestCase):
             return e
         elements =  map(f,elements)
         elements = sorted(elements, key = lambda e:(max(e.ids),min(e.ids)))
-        for e in elements:
+        '''for e in elements:
             print(e)
+        '''
     def testprepeu(self):
          elements = [ee.createDcY(0,(0,-1),1),ee.createDcEu(1,(0,1),2),
             ee.createDcEu(2,(1,-1),-2),ee.createDcEu(3,(1,2),2),
