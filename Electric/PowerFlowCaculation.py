@@ -4,26 +4,39 @@ from enum import Enum,unique
 import math as mh
 import copy
 class PFC(object):
-    '''潮流计算类PFC'''
+    '''潮流计算类PFC
+    该类采用节点电压方程组求解潮流，可计算直流和交流电路，
+    可计算包含有公共节点的多个理想电压源
+    对功率源的处理是通过假定初始电压转换为电流源，每次求解
+    完节点电压方程组后，更新功率源电压后来更新电流源。
+    '''
     # electricElementsCount = 0
     def __init__(self, numOfIterations=100, voltageOfIterator=1):
         '''初始化函数'''
         self.numOfIterations = numOfIterations
         self.voltageOfIterator = voltageOfIterator
         self.electricElements = list()
+        self.ids2 = list()
     def addElement(self, elements):
-        '''添加一个元件，可以是一个元件或者元件列表，注意元件参考节点编号为-1，其它均大于-1
+        '''函数功能：添加一个元件，可以是一个元件或者元件列表
+        参数表：
+        ----------
+        elements:元件或者元件列表。
+        注意元件参考节点编号为-1，其它均大于-1
         elements={"eType":'Y', "id":0, "ids":(0,1), "Y":1, "U":1, "I"=1}或者
         elements=[{"eType":'Y', "id":1, "ids":(0,1), "Y":1, "U":1, "I"=1},
                   {"eType":'I', "id":2, "ids":(0,1), "Y":1, "U":1, "I"=1}]
+        返回值：无
         '''
         if isinstance(elements, list):
             self.electricElements += elements
         else:
             self.electricElements.append(elements)
     def createYIMatrix(self):
-        '''构造潮流计算线性方程组的Y，I矩阵，并核实节点电压方程组节点编号以0为起点的连续编号
-           返回值(self.Y,self.I)
+        '''函数功能：构造潮流计算线性方程组的Y，I矩阵，并核实节点电压方程组节点编号以0为起点的连续编号
+           返回值：(self.Y,self.I)
+           self.Y:线性方程组导纳矩阵
+           self.I:线性方程组电流矩阵
         '''
         elments = self.electricElements
         if len(elments) <=0:raise IndexError("没有电气元件，无法进行潮流计算！")
@@ -45,10 +58,14 @@ class PFC(object):
             elif e.eType == EType.Ei:   
                 if id1 >= 0:self.I[id1,0] -= e.i
                 if id2 >= 0:self.I[id2,0] += e.i
-            elif e.eType == EType.Eu:
-                if id1 >=0: self.U[id1,0] += e.u
-                if id2 >=0: self.U[id2,0] -= e.u
-        return (self.Y,self.I)
+            #elif e.eType == EType.Eu:
+            #    if id1 >=0: self.U[id1,0] += e.u
+            #    if id2 >=0: self.U[id2,0] -= e.u
+            elif e.eType == EType.S:
+                e.i = (e.s/e.u).conjugate()
+                if id1 >= 0:self.I[id1,0] -= e.i
+                if id2 >= 0:self.I[id2,0] += e.i
+        return self.Y,self.I
     def __initYUI(self, elmentCout,type):
         N = elmentCout
         self.Y = np.mat(np.zeros((N,N),dtype=type))
@@ -70,30 +87,28 @@ class PFC(object):
         
         """解节点电压方程组"""
         #保存原电路Y，I,U矩阵
-        Y = self.Y[:,:]
-        I = self.I[:,:]
-        U = self.U[:,:]
+        Y = self.Y
+        I = self.I
         #包含理想电压源的电路的理想电压节点编号ids1及非理想电压源节点编号列表ids2
         ids1=[]
         ids2=[]
-        while self.__iteration(isFirst) and num <= self.numOfIterations:
+        while self.__iteration(isFirst,I) and num <= self.numOfIterations:
             if isFirst and len(eus) >0: #对包含电压源的电路进行预处理
                 baseId,nodeUList =  self.__prepEu(eus)
                 if baseId != -1:#对包含不是以-1为公共节点的电压源进行预处理
                     self.__changeBaseId(baseId)
-                ids1,ids2 = self.__createEuYI(nodeUList)#处理包含理想电压源的节点电压方程组
-                for n in nodeUList:#理想电压源节点的电压直接计算完毕
-                    U[n[0]] = n[1]
-            self.U = np.linalg.solve(self.Y,self.I)
+                ids1,ids2,Y,I = self.__createEuYI(nodeUList)#处理包含理想电压源的节点电压方程组
+            U = np.linalg.solve(Y,I)
+            if len(eus) > 0:#处理包含理想电压源电路的节点电压方程组的结果
+                for n in nodeUList:
+                    self.U[n[0],0] = n[1]
+                for n in ids2:
+                    self.U[n,0] = U[ids2.index(n),0]
+            else:self.U = U
+            self.I = self.Y*self.U
             num += 1
+            print(num)
             isFirst = False
-        """求解节点电压方程组后，再把理想电压源结果填写到Y，U，I中"""
-        if len(eus) >0:
-            for id in ids2:
-                U[id] = self.U[ids2.index(id)]
-            self.U = U
-            self.I = Y*U
-            self.Y = Y
         return self.U,self.Y,self.I
     def __prepEu(self,eus):
         """
@@ -174,17 +189,28 @@ class PFC(object):
         ------
         ids1: 理想电压源节点编号列表[id11,id12...]
         ids2: 剩下节点编号列表[id21,id22....]
+        Y,I:去除理想电压源形成的Y，I
         """
         nl = sorted(nodeUList, key=lambda x:x[0])
         for n in nl:
             self.I -= self.Y[:,n[0]]*n[1]
         ids1 = [n[0] for n in nl]
         ids2 = [n for n in np.arange(len(self.I)) if n not in ids1]
-        self.Y = self.Y[:,ids2][ids2,:]
-        self.I = self.I[ids2]
-        return ids1,ids2
+        Y = self.Y[:,ids2][ids2,:]
+        I = self.I[ids2]
+        self.ids2 = ids2
+        return ids1,ids2,Y,I
 
-    def __iteration(self,isFirst):
+    def iteration(self,isFirst,I):
+        """
+        函数功能：求解节点电压方程组时对功率源进行迭代，如果需要对其它类型节点
+        进行迭代，可在继承类覆盖该函数。
+        参数表：isFirst,I
+        isFirst:是否第一次迭代，若是，则忽略本函数功能，并置isFirst=True
+        I:节点电压方程组电流矩阵I
+        返回值：isIter
+        isIter:True,则进行下一次迭代，否则迭代结束
+        """
         isIter = False#是否需要继续迭代，FALSE表示迭代结束，TRUE表示继续迭代
         if isFirst:return True
         for e in self.electricElements:
@@ -192,20 +218,56 @@ class PFC(object):
                 '''元件为功率源，判断功率源前后电压是否恒定，如果是，结束迭代，否则更新功率源电流i=s/u'''
                 oldu,e.u = e.u,self.getElementU(e)
                 if(abs(oldu - e.u) > self.voltageOfIterator):
-                    newi = (e.s/e.u).conj
+                    newi = (e.s/e.u).conjugate()
                     di = newi - e.i
                     e.i = newi
-                    if e.ids[0] != -1:self.I[e.ids[0],0] -= di
-                    if e.ids[1] != -1:self.I[e.ids[1],0] += di
+                    if len(self.ids2) >0:
+                        if e.ids[0] != -1:I[self.ids2.index(e.ids[0]),0] -= di
+                        if e.ids[1] != -1:I[self.ids2.index(e.ids[1]),0] += di
+                    else:
+                        if e.ids[0] != -1:I[e.ids[0],0] -= di
+                        if e.ids[1] != -1:I[e.ids[1],0] += di
                     isIter = True#进行下一次迭代计算
         return isIter
     def getElementU(self,element):
+        """"
+        函数功能：获取电气元件电压
+        参数表：element
+        ---------
+        element:需要获取电压的元件
+        返回值：elment.u
+        --------
+        element.u:元件电压（V）
+        """
         ids = element.ids
         if ids[0] ==-1:element.u = -self.U[ids[1],0]
-        elif ids[1]:element.u = self.U[ids[0],0]
+        elif ids[1]==-1:element.u = self.U[ids[0],0]
         else:element.u = self.U[ids[0],0] - self.U[ids[1],0]
         return element.u
-        
+    def getElementResult(self,elements = None):
+        """
+        函数功能：获取元件电压（V），电流（A），功率（W），当elments == None
+        则获取所有元件相关参数
+        参数列表：elements
+        --------
+        elements:当elments=None，则该参数为全部元件，否则为elements.
+        返回值：无返回值，所有结果直接存在在elements元件列表内。
+        """
+        if  elements == None:elements = self.electricElements
+        for e in elements:
+            if e.eType != EType.Eu:e.u = self.getElementU(e)
+            if e.eType == EType.Y:e.i = e.y*e.u
+            if e.eType == EType.Eu:
+                id = e.ids[0] if e.ids[0] != -1 else e.ids[1]
+                e.i = -1* self.I[id,0]
+                ets = [ei for ei in elements if id in ei.ids and
+                (ei.eType == EType.Ei or ei.eType == EType.S)]
+                for ei in ets:
+                    if id == ei.ids[0]: e.i -= ei.i
+                    else:e.i += ei.i
+                if id == e.ids[1]:e.i *= -1 
+            if e.eType != EType.S:e.s = e.u *e.i.conjugate()                
+
 class ElectricElement(object):
     '''电气元件类，主要有eType，id,ids,u,i,r等属性,eType:电气元件类型(Y,Eu,Ei),
     id(int):元件编号,ids(int,int):元件两端节点号,参考节点编号为-1,y(float):电阻(S),u(float):电压(V),i(float):电流(A)
@@ -238,7 +300,10 @@ class ElectricElement(object):
     @staticmethod 
     def createDcEi(id,ids,i):
         return ElectricElement(EType.Ei,id,ids,0.0,0.0,i,0.0)
-    
+    @staticmethod
+    def createDcS(id,ids,s,u):
+        return ElectricElement(EType.S,id,ids,0.0,u,0.0,s)
+
     @staticmethod
     def createAcY(id,ids,y):
         return ElectricElement(EType.Y,id,ids,y,complex(0.0,0.0),complex(0.0,0.0),complex(0.0,0.0))
@@ -248,7 +313,10 @@ class ElectricElement(object):
     @staticmethod 
     def createAcEi(id,ids,i):
         return ElectricElement(EType.Ei,id,ids,complex(0.0,0.0),complex(0.0,0.0),i,complex(0.0,0.0))
-    
+    @staticmethod 
+    def createAcS(id,ids,s,u):
+        return ElectricElement(EType.S,id,ids,complex(0.0,0.0),u,complex(0.0,0.0),s)
+
     def __str__(self):
         return 'ElectricElement(电气元件类)\"eType:{0}, id:{1}, ids:({2},{3}), r:{4}A, u:{5}V, i:{6}Ω,s:{7}w"'\
     .format(self.eType,self.id,self.ids[0],self.ids[1],self.y,self.u,self.i,self.s)

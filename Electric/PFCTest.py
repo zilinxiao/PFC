@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import unittest
 from PowerFlowCaculation import PFC, ElectricElement as ee, EType#,TreeNode as tn
 import numpy as np
@@ -42,9 +43,12 @@ class PFCUnitTest(unittest.TestCase):
             #print(np.mat(pfc.Y)*np.mat(pfc.U))
             self.assertTrue(np.all(np.abs(pfc.Y*pfc.U - pfc.I <\
             np.mat(np.ones(pfc.I.shape))*1e-10)))
-            self.assertTrue(np.all(pfc.U == np.array([-10.6,-5.6,-1.2]).reshape(3,1)))
-            self.assertTrue(np.all(pfc.I == np.array([-5,0,1.0]).reshape(3,1)))
-            self.assertTrue(np.all(pfc.Y == np.array([1.0,-1.0,0,-1.0,2.0,-0.5,0.0,-0.5,1.5]).reshape(3,3)))
+            self.assertTrue(np.all(np.abs(pfc.U -np.mat(np.array([-10.6,-5.6,-1.2]).reshape(3,1)))<\
+            np.mat(np.ones(pfc.U.shape))*1e-10))
+            self.assertTrue(np.all(np.abs(pfc.I - np.mat(np.array([-5,0,1.0]).reshape(3,1))<\
+            np.mat(np.ones(pfc.I.shape))*1e-10)))
+            self.assertTrue(np.all(np.abs(pfc.Y - np.mat(np.array([1.0,-1.0,0,-1.0,2.0,-0.5,0.0,-0.5,1.5]).reshape(3,3))<\
+            np.mat(np.ones(pfc.Y.shape))*1e-10)))
             '''print(pfc.U)
             print(pfc.Y)
             print(pfc.I)'''
@@ -61,9 +65,13 @@ class PFCUnitTest(unittest.TestCase):
             pfc.caculate()
             self.assertTrue(np.all(np.abs(pfc.Y*pfc.U - pfc.I <\
             np.mat(np.ones(pfc.I.shape))*1e-10)))
-            self.assertTrue(np.all(pfc.U==np.array([-10.6,-5.6,-1.2]).reshape(3,1)))
-            self.assertTrue(np.all(pfc.I==np.array([-5,0,1.0]).reshape(3,1)))
-            self.assertTrue(np.all(pfc.Y==np.array([1.0,-1.0,0,-1.0,2.0,-0.5,0.0,-0.5,1.5]).reshape(3,3)))
+            self.assertTrue(np.all(np.abs(pfc.U -np.mat(np.array([-10.6,-5.6,-1.2]).reshape(3,1)))<\
+            np.mat(np.ones(pfc.U.shape))*1e-10))
+            self.assertTrue(np.all(np.abs(pfc.I - np.mat(np.array([-5,0,1.0]).reshape(3,1))<\
+            np.mat(np.ones(pfc.I.shape))*1e-10)))
+            self.assertTrue(np.all(np.abs(pfc.Y - np.mat(np.array([1.0,-1.0,0,-1.0,2.0,-0.5,0.0,-0.5,1.5]).reshape(3,3))<\
+            np.mat(np.ones(pfc.Y.shape))*1e-10)))
+
             '''print(pfc.U)
             print(pfc.Y)
             print(pfc.I)'''
@@ -82,14 +90,19 @@ class PFCUnitTest(unittest.TestCase):
             #print(np.mat(pfc.Y)*np.mat(pfc.U))
             self.assertTrue(np.all(np.abs(pfc.Y*pfc.U - pfc.I <\
             np.mat(np.ones(pfc.I.shape))*1e-10)))
-            self.assertTrue(np.all(pfc.U==np.array([-10.6,-5.6,-1.2]).reshape(3,1)))
-            self.assertTrue(np.all(pfc.I==np.array([-5,0,1.0]).reshape(3,1)))
-            self.assertTrue(np.all(pfc.Y==np.array([1.0,-1.0,0,-1.0,2.0,-0.5,0.0,-0.5,1.5]).reshape(3,3)))
+            self.assertTrue(np.all(np.abs(pfc.U -np.mat(np.array([-10.6,-5.6,-1.2]).reshape(3,1)))<\
+            np.mat(np.ones(pfc.U.shape))*1e-10))
+            self.assertTrue(np.all(np.abs(pfc.I - np.mat(np.array([-5,0,1.0]).reshape(3,1))<\
+            np.mat(np.ones(pfc.I.shape))*1e-10)))
+            self.assertTrue(np.all(np.abs(pfc.Y - np.mat(np.array([1.0,-1.0,0,-1.0,2.0,-0.5,0.0,-0.5,1.5]).reshape(3,3))<\
+            np.mat(np.ones(pfc.Y.shape))*1e-10)))
+
             '''print(pfc.U)
             print(pfc.Y)
             print(pfc.I)'''
         except Exception as e:
             print(e)
+    '''
     def test_preu_caculate(self):
         #测试解节点电压方程组的预处理程序，主要是测试是否有并联支路电压源
         try:
@@ -124,6 +137,7 @@ class PFCUnitTest(unittest.TestCase):
             #self.assertTrue(False)
         except Exception as e:
            print("test_preu_caculate 引发异常："+ e.args[0])
+    '''
     def test_Eu_caculate(self):
         try:
             pfc = PFC()
@@ -136,15 +150,64 @@ class PFCUnitTest(unittest.TestCase):
             #print(np.mat(pfc.Y)*np.mat(pfc.U))
             self.assertTrue(np.all(np.abs(pfc.Y*pfc.U - pfc.I <\
             np.mat(np.ones(pfc.I.shape))*1e-10)))
-            self.assertTrue(np.all(pfc.U == np.array([5,2.75,1]).reshape(3,1)))
-            self.assertTrue(np.all(pfc.I == np.array([2.25,0,0.125]).reshape(3,1)))
-            self.assertTrue(np.all(pfc.Y == np.array([1.0,-1.0,0,-1.0,2.0,-0.5,0.0,-0.5,1.5]).reshape(3,3)))
+            self.assertTrue(np.all(np.abs(pfc.U -np.mat(np.array([5,2.75,1]).reshape(3,1)))<\
+            np.mat(np.ones(pfc.U.shape))*1e-10))
+            self.assertTrue(np.all(np.abs(pfc.I - np.mat(np.array([2.25,0,0.125]).reshape(3,1))<\
+            np.mat(np.ones(pfc.I.shape))*1e-10)))
+            self.assertTrue(np.all(np.abs(pfc.Y - np.mat(np.array([1.0,-1.0,0,-1.0,2.0,-0.5,0.0,-0.5,1.5]).reshape(3,3))<\
+            np.mat(np.ones(pfc.Y.shape))*1e-10)))
+
             '''print(pfc.U)
             print(pfc.Y)
             print(pfc.I)'''
         except Exception as e:
             print(e)
-
+    def test_Eu_S_caculate(self):
+        try:
+            pfc = PFC(1000,0.1)
+            elements = [ee.createDcEu(1,(0,-1),-5),ee.createDcY(2,(0,1),1),
+                ee.createDcY(3,(-1,1),1/2.0),ee.createDcY(4,(1,2),1/2.0),
+                ee.createDcY(5,(2,-1),1/1.0),ee.createDcEu(6,(-1,2),1),
+                ee.createAcY(7,(2,3),100),ee.createDcS(8,(3,-1),20,1)]
+            pfc.addElement(elements)
+            pfc.createYIMatrix()
+            pfc.caculate()
+            #print(np.mat(pfc.Y)*np.mat(pfc.U))
+            self.assertTrue(np.all(np.abs(pfc.Y*pfc.U - pfc.I <\
+            np.mat(np.ones(pfc.I.shape))*1e-10)))
+            self.assertTrue(np.all(np.abs(pfc.U -np.mat(np.array([5,2.75,1,0.75]).reshape(4,1)))<\
+            np.mat(np.ones(pfc.U.shape))*1e-5))
+            self.assertTrue(np.all(np.abs(pfc.I - np.mat(np.array([2.25,0,25.125,-25]).reshape(4,1))<\
+            np.mat(np.ones(pfc.I.shape))*1e-5)))
+            '''
+            print("U:%s"%pfc.U)
+            print("I:%s"%pfc.I)'''
+            #print(pfc.Y)
+        except Exception as e:
+            print("test_Eu_S_caculate:%s"%e)
+    
+    def test_ac_eu_s_caculate(self):
+        pfc = PFC(100,0.01)
+        elements = [ee.createAcEu(0,(-1,0),complex(1.055)),ee.createAcS(1,(1,-1),complex(0.12,0.04),complex(1.0,0)),
+        ee.createAcS(2,(2,-1),complex(0.1,0.062),complex(1.0,0)),ee.createAcS(3,(3,-1),complex(0.2,0.1),complex(1.0,0)),
+        ee.createAcY(4,(-1,0),complex(0,0.00489)),ee.createAcY(5,(0,1),1.0/complex(0.0669,0.105)),
+        ee.createAcY(6,(-1,1),complex(0,0.00489)),ee.createAcY(7,(-1,1),complex(0,0.0065)),
+        ee.createAcY(8,(1,2),1.0/complex(0.0893,0.14)),ee.createAcY(9,(-1,2),complex(0,0.0065)),
+        ee.createAcY(10,(-1,0),complex(0,0.00748)),ee.createAcY(11,(0,2),1.0/complex(0.0781,0.155)),
+        ee.createAcY(12,(-1,2),complex(0,0.01561)),ee.createAcY(13,(2,3),1.0/complex(0.0934,0.091)),
+        ee.createAcY(14,(-1,3),complex(0,0.01561)),ee.createAcY(15,(-1,2),complex(0,0.00748))]
+        pfc.addElement(elements)
+        pfc.createYIMatrix()
+        pfc.caculate()
+        '''
+        print(pfc.U)
+        print(pfc.I)
+        print("U0:%0.3f,U1:%0.3f,U2:%0.3f,U3:%0.3f" %(abs(pfc.U[0]),abs(pfc.U[1]),abs(pfc.U[2]),abs(pfc.U[3])))
+        pfc.getElementResult()
+        for s in pfc.electricElements:
+           if s.eType != EType.Y:print('eType:{0}, ids:({1},{2}),s:{3}w'.format(s.eType,s.ids[0],s.ids[1],s.s))
+        '''   
+        
     def testTree(self):
         elements = [ee.createDcY(0,(0,-1),1),ee.createDcEu(1,(0,1),2),
             ee.createDcEu(2,(1,-1),-2),ee.createDcEu(3,(1,2),2),

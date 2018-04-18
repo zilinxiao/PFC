@@ -1,6 +1,7 @@
 import copy
 import numpy as np
 eus = [(7,8),(2,4),(5,3),(1,4),(1,2),(6,5)]
+
 def f1(eus):
     eus1 = eus[:]
     for i in eus1:#查找是否有间接并联理想电压源
@@ -88,3 +89,14 @@ print(eus)
 
 eus=[(-2,2),(-1,1),(-1,3)]
 print(len(set(eus[0]) & set(eus[1])))
+
+eus = [(7,8),(2,4),(5,3),(1,4),(1,2),(6,5)]
+g = list()
+for e in eus:
+    g1 = list()
+    g1.append(e)
+    for s in eus:
+        if len(set(s) & set(e))==1: g1.append(s)
+    g.append(g1)
+for g1 in g:
+    print(g1)
