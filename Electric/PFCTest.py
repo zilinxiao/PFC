@@ -199,14 +199,14 @@ class PFCUnitTest(unittest.TestCase):
         pfc.addElement(elements)
         pfc.createYIMatrix()
         pfc.caculate()
-        '''
+        
         print(pfc.U)
         print(pfc.I)
         print("U0:%0.3f,U1:%0.3f,U2:%0.3f,U3:%0.3f" %(abs(pfc.U[0]),abs(pfc.U[1]),abs(pfc.U[2]),abs(pfc.U[3])))
         pfc.getElementResult()
         for s in pfc.electricElements:
            if s.eType != EType.Y:print('eType:{0}, ids:({1},{2}),s:{3}w'.format(s.eType,s.ids[0],s.ids[1],s.s))
-        '''   
+         
         
     def testTree(self):
         elements = [ee.createDcY(0,(0,-1),1),ee.createDcEu(1,(0,1),2),

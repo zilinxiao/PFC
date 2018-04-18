@@ -92,7 +92,7 @@ class PFC(object):
         #包含理想电压源的电路的理想电压节点编号ids1及非理想电压源节点编号列表ids2
         ids1=[]
         ids2=[]
-        while self.__iteration(isFirst,I) and num <= self.numOfIterations:
+        while self.iteration(isFirst,I) and num <= self.numOfIterations:
             if isFirst and len(eus) >0: #对包含电压源的电路进行预处理
                 baseId,nodeUList =  self.__prepEu(eus)
                 if baseId != -1:#对包含不是以-1为公共节点的电压源进行预处理
