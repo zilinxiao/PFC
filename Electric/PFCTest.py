@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 import unittest
-from PowerFlowCaculation import PFC, ElectricElement as ee, EType#,TreeNode as tn
+from powerFlowCaculation import PFC, ElectricElement as ee, EType#,TreeNode as tn
 import numpy as np
 
 class PFCUnitTest(unittest.TestCase):
