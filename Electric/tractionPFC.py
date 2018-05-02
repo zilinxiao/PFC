@@ -1,6 +1,6 @@
-from traits.api import HasTraits,Range,Enum,List
+from traits.api import HasTraits,Range,Enum,List,HasStrictTraits
 from traitsui.api import View,Item,HGroup,VGroup,OKButton,CancelButton,\
-ApplyButton,RevertButton,Action,Handler,TableEditor
+ApplyButton,RevertButton,Action,Handler,TableEditor,Group
 from traitsui.table_column import ObjectColumn
 from pyface.api import GUI
 from traitsui.table_filter \
@@ -63,7 +63,7 @@ def f1():
     if cb.configure_traits(handler=CableHandler):
         print(cb.x)
     print(cb.x)
-
+#f1()
 cableArgs_table = TableEditor(
     columns=[ObjectColumn(name = 's',label='电缆截面(mm2)',width = 0.1),
         ObjectColumn(name = 'r',label='电阻（Ω）',width = 0.1),
@@ -71,25 +71,19 @@ cableArgs_table = TableEditor(
         ObjectColumn(name = 'x0',label='零序电抗（Ω)',width = 0.1),
         ObjectColumn(name = 'g',label='对地电导(s)',width = 0.1),
         ObjectColumn(name = 'b',label='对地电纳(s)',width = 0.1)],
-    deletable=True,
-    sort_model=True,
-    auto_size=False,
     orientation='vertical',        
-    edit_view=View(
-        HGroup(
-            VGroup(Item('s',label=u'电缆截面(mm2)'),Item('r',label=u'电阻（Ω）'),
-                Item('x',label=u'电抗（Ω)'), Item('x0',label=u'零序电抗（Ω)'),
-                Item('g',label=u'对地电导(s)'),Item('b',label=u'对地电纳(s)'),
-                show_border=True),
-            VGroup(Item('u0',label=u'相电压（kV）'),Item('u',label=u'额定电压（kV）'),
-                Item('number',label=u'电缆芯数'),Item('f',label=u'电源频率(Hz)'),
-                Item('l',label=u'电感（H/km)'),Item('c',label=u'对地电容(F)'),
-                show_border=True),
-            padding = 5),
-        resizable = True),
+    edit_view=View(HGroup(
+        VGroup(Item('s',label=u'电缆截面(mm2)'),'10',Item('r',label=u'电阻（Ω）'),'10',
+        Item('x',label=u'电抗（Ω)'),'10', Item('x0',label=u'零序电抗（Ω)'),'10',
+        Item('g',label=u'对地电导(s)'),'10',Item('b',label=u'对地电纳(s)'),
+        show_border=True),
+        VGroup(Item('u0',label=u'相电压（kV）'),'10',Item('u',label=u'额定电压（kV）'),'10',
+        Item('number',label=u'电缆芯数'),'10',Item('f',label=u'电源频率(Hz)'),'10',
+        Item('l',label=u'电感（H/km)'),'10',Item('c',label=u'对地电容(F)'),
+        show_border=True),padding = 10),),
     row_factory=Cable)
     
-class CableArgsTable(HasTraits):
+class CableArgsTable(HasStrictTraits):
     cables = List(Cable)
     view = View(
         VGroup(
@@ -123,7 +117,8 @@ class CablesHandler(Handler):
         GUI().stop_event_loop()        
         return is_ok
 def f2():
-    cableargstable = CableArgsTable()
+    cables = [Cable()]
+    cableargstable = CableArgsTable(cables = cables)
     cableargstable.configure_traits()
 f2()
 
