@@ -1,12 +1,13 @@
-from traits.api import HasTraits,Range,Enum,List,HasStrictTraits
+from traits.api import HasTraits,Range,Enum,List,HasStrictTraits,Bool
 from traitsui.api import View,Item,HGroup,VGroup,OKButton,CancelButton,\
 ApplyButton,RevertButton,Action,Handler,TableEditor,Group
-from traitsui.table_column import ObjectColumn
+from traitsui.table_column import ObjectColumn,ExpressionColumn
 from pyface.api import GUI
 from traitsui.table_filter \
     import EvalFilterTemplate, MenuFilterTemplate, RuleFilterTemplate, \
     EvalTableFilter
 import numpy as np
+#from traitsui.editors.table_editor import BoolOrCallable
 class Cable(HasTraits):
     '''
     电缆参数类
@@ -65,7 +66,8 @@ def f1():
     print(cb.x)
 #f1()
 cableArgs_table = TableEditor(
-    columns=[ObjectColumn(name = 's',label='电缆截面(mm2)',width = 0.1),
+    columns=[ExpressionColumn(label='电缆截面(mm2)',width = 0.3,
+        expression="'%smm2,%s/%skV,%sHz' %(object.s,object.u0,object.u,object.f)"),
         ObjectColumn(name = 'r',label='电阻（Ω）',width = 0.1),
         ObjectColumn(name = 'x',label='电抗（Ω)',width = 0.1),
         ObjectColumn(name = 'x0',label='零序电抗（Ω)',width = 0.1),
@@ -81,10 +83,13 @@ cableArgs_table = TableEditor(
         Item('number',label=u'电缆芯数'),'10',Item('f',label=u'电源频率(Hz)'),'10',
         Item('l',label=u'电感（H/km)'),'10',Item('c',label=u'对地电容(F)'),
         show_border=True),padding = 10),),
-    row_factory=Cable)
+    row_factory=Cable,
+    deletable=True,
+    auto_add=True
+    )
     
 class CableArgsTable(HasStrictTraits):
-    cables = List(Cable)
+    cables = List(Cable) 
     view = View(
         VGroup(
             Item('cables',
@@ -94,8 +99,8 @@ class CableArgsTable(HasStrictTraits):
             show_border=True,
         ),
         title='电缆参数设置',
-        width=.6,
-        height=.6,
+        width=.4,
+        height=.5,
         resizable=True,
         buttons =[Action(name='添加',action='addItem'),
         Action(name='删除',action='delItem'),
@@ -105,21 +110,26 @@ class CableArgsTable(HasStrictTraits):
     )
 class CablesHandler(Handler):
     def addItem(self,info):
-        print("addItem")
+        c =  info.object
+        c.cables.append(Cable())
     def delItem(self,info):
-        print('delItem')
+        s =  info.ui._editors[0].selected
+        c =  info.object
+        if s in c.cables:
+            c.cables.remove(s)
     def ok(self,info):
         info.ui.dispose(True)
     def cancel(self,info):
         info.ui.dispose(False)
     def closed(self,info,is_ok):
-        super(CableHandler,self).closed(info,is_ok)
+        super(CablesHandler,self).closed(info,is_ok)
         GUI().stop_event_loop()        
         return is_ok
 def f2():
-    cables = [Cable()]
+    cables = [Cable(),Cable(s=120)]
     cableargstable = CableArgsTable(cables = cables)
-    cableargstable.configure_traits()
+    cableargstable.configure_traits(handler=CablesHandler)
+
 f2()
 
 
