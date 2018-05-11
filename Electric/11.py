@@ -1,40 +1,41 @@
-from traits.api import HasTraits,Range,Enum,List,HasStrictTraits
-from traitsui.api import View,Item,TableEditor,Group
-from traitsui.table_column import ObjectColumn
+#-*- coding:utf-8 -*-
+import sys
+from PyQt4.QtGui import QWidget,QPushButton,QApplication,\
+    QMessageBox,QHBoxLayout,QVBoxLayout
 
-class Person(HasTraits):
-    name = str
-    age = Range(low=0,value=20)
+class mywidget(QWidget):
+    def __init__(self,parent=None):
+        QWidget.__init__(self,parent)
+        self.setGeometry(300,300,1000,1000)
+        self.setWindowTitle('hello，pyqt4!')
+        self.setToolTip('这是qt4程序')
 
-def f1():
-    p = Person(name = "111")
-    p.configure_traits()
+        btok = QPushButton('ok',self)
+        btcancel = QPushButton('cancel',self)
+        btok.clicked.connect(self.close)
+        
+        hb = QHBoxLayout()
+        hb.addStretch(1)
+        hb.addWidget(btok)
+        hb.addSpacing(20)
+        hb.addWidget(btcancel)
+        hb.addStretch(1)
 
-f1()
+        vb = QVBoxLayout()
+        vb.addStretch(1)
+        vb.addLayout(hb)
+        vb.addSpacing(20)
 
-personTables = TableEditor(columns=[
-    ObjectColumn(name = 'name',width = 0.2),
-    ObjectColumn(name='age',width=0.2)],
-    edit_view = View(Group('name','age')),
-    row_factory=Person)
+        self.setLayout(vb)
 
-class Department(HasStrictTraits):
-    persons = List(Person)
-    traits_view = View(
-    Group(
-        Item('persons',
-                show_label=False,
-                editor=personTables
-                ),
-        show_border=True,
-    ),
-    title='TableEditor',
-    width=.4,
-    height=.4,
-    resizable=True,
-    buttons=['OK'],
-    kind='live'
-    )
-ps = [Person(name = '11',age=1)]
-dp = Department(persons = ps)
-dp.configure_traits()
+    def closeEvent(self,event):
+        quit = QMessageBox.question(self,'信息','是否退出',\
+        QMessageBox.Yes|QMessageBox.No)
+        if quit == QMessageBox.Yes:
+            event.accept()
+        else:event.ignore()
+
+app = QApplication(sys.argv)
+wg = mywidget()
+wg.show()
+sys.exit(app.exec_())

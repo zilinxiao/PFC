@@ -1,3 +1,4 @@
+#-*-coding:utf-8 -*-
 from traits.api import HasTraits,Range,Enum,List,HasStrictTraits,Bool
 from traitsui.api import View,Item,HGroup,VGroup,OKButton,CancelButton,\
 ApplyButton,RevertButton,Action,Handler,TableEditor,Group
@@ -39,8 +40,8 @@ class Cable(HasTraits):
     
     view = View(HGroup(
         VGroup(Item('s',label=u'电缆截面(mm2)'),Item('r',label=u'电阻（Ω）'),
-        Item('x',label=u'电抗（Ω)'), Item('x0',label=u'零序电抗（Ω)'),
-        Item('g',label=u'对地电导(s)'),Item('b',label=u'对地电纳(s)'),
+        Item('x',label=u'电抗（Ω)',format_str='%0.4e'), Item('x0',label=u'零序电抗（Ω)'),
+        Item('g',label=u'对地电导(s)'),Item('b',label=u'对地电纳(s)',format_str='%0.4e'),
         show_border=True),
         VGroup(Item('u0',label=u'相电压（kV）'),Item('u',label=u'额定电压（kV）'),
         Item('number',label=u'电缆芯数'),Item('f',label=u'电源频率(Hz)'),
@@ -48,7 +49,6 @@ class Cable(HasTraits):
         show_border=True),padding = 10),title=u'电缆参数设置',resizable = True,
         buttons =[Action(name='确定',action='ok'),
         Action(name='取消',action='cancel')])
-
 
 class CableHandler(Handler):
     def ok(self,info):
@@ -69,10 +69,10 @@ cableArgs_table = TableEditor(
     columns=[ExpressionColumn(label='电缆截面(mm2)',width = 0.3,
         expression="'%smm2,%s/%skV,%sHz' %(object.s,object.u0,object.u,object.f)"),
         ObjectColumn(name = 'r',label='电阻（Ω）',width = 0.1),
-        ObjectColumn(name = 'x',label='电抗（Ω)',width = 0.1),
+        ObjectColumn(name = 'x',label='电抗（Ω)',width = 0.1,format='%0.4e'),
         ObjectColumn(name = 'x0',label='零序电抗（Ω)',width = 0.1),
         ObjectColumn(name = 'g',label='对地电导(s)',width = 0.1),
-        ObjectColumn(name = 'b',label='对地电纳(s)',width = 0.1)],
+        ObjectColumn(name = 'b',label='对地电纳(s)',width = 0.1,format='%0.4e')],
     orientation='vertical',        
     edit_view=View(HGroup(
         VGroup(Item('s',label=u'电缆截面(mm2)'),'10',Item('r',label=u'电阻（Ω）'),'10',
@@ -104,8 +104,7 @@ class CableArgsTable(HasStrictTraits):
         resizable=True,
         buttons =[Action(name='添加',action='addItem'),
         Action(name='删除',action='delItem'),
-        Action(name='确定',action='ok'),
-        Action(name='取消',action='cancel')],
+        Action(name='OK',label='确定'),Action(name='Cancel',label='取消')],
         kind='live'
     )
 class CablesHandler(Handler):
@@ -117,20 +116,13 @@ class CablesHandler(Handler):
         c =  info.object
         if s in c.cables:
             c.cables.remove(s)
-    def ok(self,info):
-        info.ui.dispose(True)
-    def cancel(self,info):
-        info.ui.dispose(False)
-    def closed(self,info,is_ok):
-        super(CablesHandler,self).closed(info,is_ok)
-        GUI().stop_event_loop()        
-        return is_ok
 def f2():
     cables = [Cable(),Cable(s=120)]
     cableargstable = CableArgsTable(cables = cables)
     cableargstable.configure_traits(handler=CablesHandler)
 
 f2()
+print('exit')
 
 
 
